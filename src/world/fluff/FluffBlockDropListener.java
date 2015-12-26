@@ -20,6 +20,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
+import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
 
 public class FluffBlockDropListener implements Listener {
@@ -140,7 +141,11 @@ public class FluffBlockDropListener implements Listener {
 				}
 				else
 				{
+					
 					fwdb.givePlayerPoints(name, 1);
+					
+					//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
+					event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
 				}
 				//Must check if Entity Data -> SkeletonType == 1 for Wither Skeleton
 			}
@@ -166,7 +171,15 @@ public class FluffBlockDropListener implements Listener {
 			}
 			else if(ent == EntityType.WITCH)
 			{
-				fwdb.givePlayerPoints(name, 2);
+				fwdb.givePlayerPoints(name, 3);
+			}
+			else if(ent == EntityType.SILVERFISH)
+			{
+				fwdb.givePlayerPoints(name, 1);
+			}
+			else if(ent == EntityType.ENDERMITE)
+			{
+				fwdb.givePlayerPoints(name, 1);
 			}
 		}
 	}
