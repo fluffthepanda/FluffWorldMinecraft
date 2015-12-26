@@ -17,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
@@ -254,23 +255,23 @@ public class FluffBlockDropListener implements Listener {
 		}
 	}
 	
-	// FurnaceExtractEvent.getItemAmount() doesn't work for amounts greater than 1; it'll just return 0
-	/*@EventHandler
+	@EventHandler
 	public void onSmelt(FurnaceExtractEvent event)
 	{
 		Material block = event.getItemType();
 		String name = event.getPlayer().getName();
-		int amount = event.getItemAmount();
-		if(amount != 0)
+		int exp = event.getExpToDrop(); //getItemAmount() doesn't work for values > 1. We can get the # of items by getting the total EXP and dividing by EXP-per-item
+		if(block == Material.GOLD_INGOT)
 		{
-			if(block == Material.GOLD_INGOT)
-			{
-				fwdb.givePlayerPoints(name, amount * 2);
-			}
-			else if(block == Material.IRON_INGOT)
-			{
-				fwdb.givePlayerPoints(name, amount);
-			}
+			double expPerItem = 1.0;
+			int amount = (int)Math.ceil(exp/expPerItem);
+			fwdb.givePlayerPoints(name, amount * 2);
 		}
-	}*/
+		else if(block == Material.IRON_INGOT)
+		{
+			double expPerItem = 0.7;
+			int amount = (int)Math.ceil(exp/expPerItem);
+			fwdb.givePlayerPoints(name, amount);
+		}
+	}
 }

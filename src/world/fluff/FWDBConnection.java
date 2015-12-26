@@ -223,6 +223,10 @@ public class FWDBConnection {
 	
 	public int givePlayerPoints(String name, int points, Boolean message)
 	{
+		if(points < 1)
+		{
+			return 0;
+		}
 		try
 	    {
 	    	stmt = connection.createStatement();
@@ -316,6 +320,10 @@ public class FWDBConnection {
 	
 	public int subtractPlayerPoints(String name, int points, Boolean message)
 	{
+		if(points < 1)
+		{
+			return 0;
+		}
 		try
 	    {
 	    	stmt = connection.createStatement();
