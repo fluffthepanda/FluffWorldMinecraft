@@ -135,6 +135,7 @@ public class FWDBConnection {
 		return 0;
 	}
 	
+	//fetches dummy value to make sure the connection is live
 	public boolean checkConnection()
 	{
 		try
