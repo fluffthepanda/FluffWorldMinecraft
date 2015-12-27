@@ -94,7 +94,7 @@ public class FluffWorldIntegration extends JavaPlugin {
         	if(args.length == 0)
         	{
         		sender.sendMessage("You must enter your Fluff World username.");
-        		return true;
+        		return false;
         	}
         	else
         	{

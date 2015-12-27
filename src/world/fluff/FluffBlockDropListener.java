@@ -145,8 +145,11 @@ public class FluffBlockDropListener implements Listener {
 					
 					fwdb.givePlayerPoints(name, 1);
 					
-					//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
-					event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+					{
+						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
+						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+					}
 				}
 				//Must check if Entity Data -> SkeletonType == 1 for Wither Skeleton
 			}
