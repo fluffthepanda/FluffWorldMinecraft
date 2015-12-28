@@ -31,9 +31,30 @@ public class FluffWorldIntegration extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("points"))
         {
-        	int p = fwdb.getPlayerPoints(sender.getName());
-            sender.sendMessage("You have " + p + " FWMC points.");
-            return true;
+        	
+        	if(args.length == 0)
+        	{
+        		int p = fwdb.getPlayerPoints(sender.getName());
+                sender.sendMessage("You have " + p + " FWMC points.");
+                return true;
+        	}
+        	else
+        	{        		
+        		if(fwdb.checkIfNameInDb(args[0]))
+        		{
+        			//the requested user is in the database
+        			int p = fwdb.getPlayerPoints(args[0]);
+                    sender.sendMessage("Player "+args[0]+" has " + p + " FWMC points.");
+                    return true;
+        		}
+        		else 
+        		{
+        			//the requested user is NOT in the database
+        			sender.sendMessage("Player "+args[0]+" is not in the database.");
+        			return false;
+        		}
+        	}
+        	
         }
         else if(command.getName().equalsIgnoreCase("chatcolor"))
         {
