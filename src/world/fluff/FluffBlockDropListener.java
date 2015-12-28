@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
@@ -151,8 +150,8 @@ public class FluffBlockDropListener implements Listener {
 					
 					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
 					{
-						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
-						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-2 gunpowder.
+						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
 					}
 				}
 			}
@@ -292,4 +291,5 @@ public class FluffBlockDropListener implements Listener {
 			fwdb.givePlayerPoints(name, amount);
 		}
 	}
+	
 }

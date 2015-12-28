@@ -16,7 +16,6 @@ public class FluffWorldIntegration extends JavaPlugin {
 	// Fired when plugin is first enabled
     @Override
     public void onEnable() {
-    	System.out.println("FluffWorldIntegration enabled!");
     	fwdb = new FWDBConnection();
     	fsb = new FluffsScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
     	getServer().getPluginManager().registerEvents(new FluffBlockDropListener(fwdb, fsb), this);
