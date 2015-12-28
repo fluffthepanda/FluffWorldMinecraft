@@ -135,6 +135,7 @@ public class FWDBConnection {
 		return 0;
 	}
 	
+	//fetches dummy value to make sure the connection is live
 	public boolean checkConnection()
 	{
 		try
@@ -222,6 +223,10 @@ public class FWDBConnection {
 	
 	public int givePlayerPoints(String name, int points, Boolean message)
 	{
+		if(points < 1)
+		{
+			return 0;
+		}
 		try
 	    {
 	    	stmt = connection.createStatement();
@@ -315,6 +320,10 @@ public class FWDBConnection {
 	
 	public int subtractPlayerPoints(String name, int points, Boolean message)
 	{
+		if(points < 1)
+		{
+			return 0;
+		}
 		try
 	    {
 	    	stmt = connection.createStatement();

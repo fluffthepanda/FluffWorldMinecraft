@@ -17,9 +17,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
+import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
 
 public class FluffBlockDropListener implements Listener {
@@ -33,20 +35,26 @@ public class FluffBlockDropListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event)
 	{
+		//Database times out after 8 hours.
+		//checkConnection() tries to read a dummy value from the database
+		//The JDBC driver in FWDBConnection.java is set to autoReconnect=true
+		//If checkConnection fails, the driver automatically knows to reconnect, so the next DB access attempt will have a live connection.
 		if(!fwdb.checkConnection())
 		{
 			Bukkit.broadcastMessage(ChatColor.RED + "Database connection timed out. " + ChatColor.GREEN + "Reconnecting..." + ChatColor.RESET);
 		}
+		
 		String name = event.getPlayer().getName();
 		Player player = event.getPlayer();
 		int p = fwdb.getPlayerPoints(name);
 		ChatColor color = fwdb.getChatColor(name);
+		
 		event.getPlayer().setPlayerListName(color + name + ChatColor.RESET);
 		event.getPlayer().setDisplayName(color + name + ChatColor.RESET);
 		Bukkit.broadcastMessage("Welcome, " + color + name + ChatColor.RESET + ".");
 		Bukkit.broadcastMessage(color + name + ChatColor.RESET + " has " + p + " FWMC points.");
 		event.setJoinMessage(null);
-		player.setScoreboard(fsb.getScoreboard());
+		player.setScoreboard(fsb.getScoreboard()); //set custom scoreboard (XP tracker)
 		fsb.refreshPlayerXP(player);
 	}
 	@EventHandler
@@ -57,9 +65,9 @@ public class FluffBlockDropListener implements Listener {
 		Material block = event.getBlock().getType();
 		ItemStack item = event.getPlayer().getItemInHand();
 		fwdb.addBlockBreakStat(name);
-		if(!item.containsEnchantment(Enchantment.SILK_TOUCH))
+		if(!item.containsEnchantment(Enchantment.SILK_TOUCH)) //no points for blocks broken with silk touch for obvious reasons
 		{
-			if(item.getType() == Material.IRON_PICKAXE || item.getType() == Material.DIAMOND_PICKAXE)
+			if(item.getType() == Material.IRON_PICKAXE || item.getType() == Material.DIAMOND_PICKAXE) //makes sure minerals are harvested and block is not wasted
 			{
 				if(block == Material.DIAMOND_ORE)
 				{
@@ -134,9 +142,16 @@ public class FluffBlockDropListener implements Listener {
 				}
 				else
 				{
+					
 					fwdb.givePlayerPoints(name, 1);
+					
+					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+					{
+						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
+						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+					}
 				}
-				//Must check if Entity Data -> SkeletonType == 1
+				//Must check if Entity Data -> SkeletonType == 1 for Wither Skeleton
 			}
 			else if(ent == EntityType.ZOMBIE)
 			{
@@ -153,14 +168,22 @@ public class FluffBlockDropListener implements Listener {
 			else if(ent == EntityType.SPIDER)
 			{
 				long time = event.getEntity().getKiller().getWorld().getTime();
-				if(time > 12000 && time < 24000)
+				if(time > 12000 && time < 24000) //12000 = 6pm, 23999 = 5:59am
 				{
 					fwdb.givePlayerPoints(name, 1);
 				}
 			}
 			else if(ent == EntityType.WITCH)
 			{
-				fwdb.givePlayerPoints(name, 2);
+				fwdb.givePlayerPoints(name, 3);
+			}
+			else if(ent == EntityType.SILVERFISH)
+			{
+				fwdb.givePlayerPoints(name, 1);
+			}
+			else if(ent == EntityType.ENDERMITE)
+			{
+				fwdb.givePlayerPoints(name, 1);
 			}
 		}
 	}
@@ -171,7 +194,7 @@ public class FluffBlockDropListener implements Listener {
 		EntityType ent = event.getEntityType();
 		if(ent == EntityType.CREEPER)
 		{
-			event.setCancelled(true);
+			event.setCancelled(true); //cause fuck creepers.
 		}
 	}
 	
@@ -231,27 +254,27 @@ public class FluffBlockDropListener implements Listener {
 				fwdb.subtractPlayerPoints(died.getName(), points_taken, false);
 				event.setDeathMessage(event.getDeathMessage() + " and lost " + points_taken + " points.");
 			}
-			Bukkit.broadcastMessage(fwdb.getChatColor(died.getName()) + " " + ChatColor.RESET + "died at X: " + death_loc.getBlockX() + "  Y: " + death_loc.getBlockY() + "  Z: " + death_loc.getBlockZ());
+			Bukkit.broadcastMessage(fwdb.getChatColor(died.getName()) + died.getName() + " " + ChatColor.RESET + "died at X: " + death_loc.getBlockX() + "  Y: " + death_loc.getBlockY() + "  Z: " + death_loc.getBlockZ());
 		}
 	}
 	
-	// FurnaceExtractEvent.getItemAmount() doesn't work for amounts greater than 1; it'll just return 0
-	/*@EventHandler
+	@EventHandler
 	public void onSmelt(FurnaceExtractEvent event)
 	{
 		Material block = event.getItemType();
 		String name = event.getPlayer().getName();
-		int amount = event.getItemAmount();
-		if(amount != 0)
+		int exp = event.getExpToDrop(); //getItemAmount() doesn't work for values > 1. We can get the # of items by getting the total EXP and dividing by EXP-per-item
+		if(block == Material.GOLD_INGOT)
 		{
-			if(block == Material.GOLD_INGOT)
-			{
-				fwdb.givePlayerPoints(name, amount * 2);
-			}
-			else if(block == Material.IRON_INGOT)
-			{
-				fwdb.givePlayerPoints(name, amount);
-			}
+			double expPerItem = 1.0;
+			int amount = (int)Math.ceil(exp/expPerItem);
+			fwdb.givePlayerPoints(name, amount * 2);
 		}
-	}*/
+		else if(block == Material.IRON_INGOT)
+		{
+			double expPerItem = 0.7;
+			int amount = (int)Math.ceil(exp/expPerItem);
+			fwdb.givePlayerPoints(name, amount);
+		}
+	}
 }
