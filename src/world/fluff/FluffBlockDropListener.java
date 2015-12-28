@@ -5,10 +5,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Guardian;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -136,22 +138,22 @@ public class FluffBlockDropListener implements Listener {
 			}
 			else if(ent == EntityType.SKELETON)
 			{
-				if(event.getEntity().getKiller().getWorld().getBiome(player.getLocation().getBlockX(), player.getLocation().getBlockZ()) == Biome.HELL)
+				Skeleton s = (Skeleton) event.getEntity();
+				
+				if(s.getSkeletonType() == SkeletonType.WITHER)
 				{
 					fwdb.givePlayerPoints(name, 4);
 				}
 				else
 				{
-					
 					fwdb.givePlayerPoints(name, 1);
 					
 					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
 					{
-						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-3 gunpowder.
-						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-2 gunpowder.
+						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
 					}
 				}
-				//Must check if Entity Data -> SkeletonType == 1 for Wither Skeleton
 			}
 			else if(ent == EntityType.ZOMBIE)
 			{
@@ -163,7 +165,7 @@ public class FluffBlockDropListener implements Listener {
 			}
 			else if(ent == EntityType.GHAST)
 			{
-				fwdb.givePlayerPoints(name, 4);
+				fwdb.givePlayerPoints(name, 6); //point count subject to change
 			}
 			else if(ent == EntityType.SPIDER)
 			{
@@ -184,6 +186,18 @@ public class FluffBlockDropListener implements Listener {
 			else if(ent == EntityType.ENDERMITE)
 			{
 				fwdb.givePlayerPoints(name, 1);
+			}
+			else if(ent == EntityType.GUARDIAN)
+			{
+				Guardian g = (Guardian) event.getEntity();
+				if(g.isElder()) {
+					//The big boss Guardian
+					fwdb.givePlayerPoints(name, 350); //point count subject to change
+				}
+				else
+				{
+					fwdb.givePlayerPoints(name, 15); //point count subject to change
+				}
 			}
 		}
 	}
@@ -277,4 +291,5 @@ public class FluffBlockDropListener implements Listener {
 			fwdb.givePlayerPoints(name, amount);
 		}
 	}
+	
 }
