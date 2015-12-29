@@ -6,13 +6,13 @@ description: Fluff's Plugin
 commands:
   points:
     description: (FWMC) Displays your FWMC points
-    usage: /points
+    usage: /points [username]
   chatcolor:
     description: (FWMC) Changes your color in the chat
-    usage: /chatcolor color
+    usage: /chatcolor <color>
   coords:
     description: (FWMC) Broadcast your coordinates
     usage: /coords
   register:
     description: (FWMC) Link your FW account
-    usage: /register FWusername
+    usage: /register <FW username>
