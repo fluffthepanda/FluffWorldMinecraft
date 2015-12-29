@@ -7,19 +7,22 @@ import org.bukkit.scoreboard.Scoreboard;
 
 public class FluffsScoreboard {
 	private Scoreboard fwScoreboard;
-	public FluffsScoreboard(Scoreboard fsb)
+	private FWDBConnection fwdb;
+	public FluffsScoreboard(Scoreboard fsb, FWDBConnection conn)
 	{
 		fwScoreboard = fsb;
+		fwdb = conn;
 		createXPObjective();
 		createHealthObjective();
-		//createPointsObjective();
+		createPointsObjective();
 	}
 	
-	/*private void createPointsObjective()
+	private void createPointsObjective()
 	{
-		fwScoreboard.registerNewObjective("FWMC Points", "FWMC_POINTS");
-		fwScoreboard.getObjective("FWMC Points").setDisplaySlot(DisplaySlot.SIDEBAR);
-	}*/
+		fwScoreboard.registerNewObjective("FWMCPoints", "FWMC_POINTS");
+		fwScoreboard.getObjective("FWMCPoints").setDisplayName("FWMC Points");
+		fwScoreboard.getObjective("FWMCPoints").setDisplaySlot(DisplaySlot.SIDEBAR);
+	}
 	
 	private void createXPObjective()
 	{
@@ -47,10 +50,10 @@ public class FluffsScoreboard {
 		fwScoreboard.getObjective("health").unregister();
 	}
 	
-	/*public void refreshPlayerPoints(String name)
+	public void refreshPlayerPoints(String name)
 	{
-		//fwScoreboard.getObjective("XP").getScore(name).setScore();
-	}*/
+		fwScoreboard.getObjective("FWMCPoints").getScore(fwdb.getChatColor(name) + name).setScore(fwdb.getPlayerPoints(name));
+	}
 	
 	public void refreshPlayerXP(Player player)
 	{

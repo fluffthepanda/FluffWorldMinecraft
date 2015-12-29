@@ -218,7 +218,7 @@ public class FWDBConnection {
 	
 	public int givePlayerPoints(String name, int points)
 	{
-		return givePlayerPoints(name, points, true);
+		return givePlayerPoints(name, points, false);
 	}
 	
 	public int givePlayerPoints(String name, int points, Boolean message)
@@ -315,7 +315,7 @@ public class FWDBConnection {
 	
 	public int subtractPlayerPoints(String name, int points)
 	{
-		return subtractPlayerPoints(name, points, true);
+		return subtractPlayerPoints(name, points, false);
 	}
 	
 	public int subtractPlayerPoints(String name, int points, Boolean message)

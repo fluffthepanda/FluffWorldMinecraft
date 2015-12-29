@@ -17,7 +17,7 @@ public class FluffWorldIntegration extends JavaPlugin {
     @Override
     public void onEnable() {
     	fwdb = new FWDBConnection();
-    	fsb = new FluffsScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+    	fsb = new FluffsScoreboard(Bukkit.getScoreboardManager().getNewScoreboard(), fwdb);
     	getServer().getPluginManager().registerEvents(new FluffBlockDropListener(fwdb, fsb), this);
     }
     // Fired when plugin is disabled
@@ -43,7 +43,7 @@ public class FluffWorldIntegration extends JavaPlugin {
         		{
         			//the requested user is in the database
         			int p = fwdb.getPlayerPoints(args[0]);
-                    sender.sendMessage("Player "+args[0]+" has " + p + " FWMC points.");
+                    sender.sendMessage("Player "+ fwdb.getChatColor(args[0])+args[0]+ChatColor.RESET+ " has " + p + " FWMC points.");
                     return true;
         		}
         		else 

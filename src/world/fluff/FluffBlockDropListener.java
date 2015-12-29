@@ -58,6 +58,7 @@ public class FluffBlockDropListener implements Listener {
 		event.setJoinMessage(null);
 		player.setScoreboard(fsb.getScoreboard()); //set custom scoreboard (XP tracker)
 		fsb.refreshPlayerXP(player);
+		fsb.refreshPlayerPoints(player.getName());
 	}
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event)
@@ -66,6 +67,7 @@ public class FluffBlockDropListener implements Listener {
 		String name = event.getPlayer().getName();
 		Material block = event.getBlock().getType();
 		ItemStack item = event.getPlayer().getItemInHand();
+		int rows = 0;
 		fwdb.addBlockBreakStat(name);
 		if(!item.containsEnchantment(Enchantment.SILK_TOUCH)) //no points for blocks broken with silk touch for obvious reasons
 		{
@@ -73,19 +75,23 @@ public class FluffBlockDropListener implements Listener {
 			{
 				if(block == Material.DIAMOND_ORE)
 				{
-					fwdb.givePlayerPoints(name, 10);
+					rows = fwdb.givePlayerPoints(name, 10);
 				}
 				else if(block == Material.EMERALD_ORE)
 				{
-					fwdb.givePlayerPoints(name, 25);
+					rows = fwdb.givePlayerPoints(name, 25);
 				}
 			}
 			if(item.getType() == Material.STONE_PICKAXE || item.getType() == Material.IRON_PICKAXE || item.getType() == Material.DIAMOND_PICKAXE)
 			{
 				if(block == Material.LAPIS_ORE)
 				{
-					fwdb.givePlayerPoints(name, 3);
+					rows = fwdb.givePlayerPoints(name, 3);
 				}
+			}
+			if(rows > 0)
+			{
+				fsb.refreshPlayerPoints(name);
 			}
 		}
 	}
@@ -113,28 +119,29 @@ public class FluffBlockDropListener implements Listener {
 	{
 		if(event.getEntity().getKiller() != null)
 		{
-			Player player = event.getEntity().getKiller().getPlayer();
+			//Player player = event.getEntity().getKiller().getPlayer();
 			String name = event.getEntity().getKiller().getName();
 			EntityType ent = event.getEntity().getType();
+			int rows = 0;
 			if(ent == EntityType.ENDERMAN)
 			{
-				fwdb.givePlayerPoints(name, 8);
+				rows = fwdb.givePlayerPoints(name, 8);
 			}
 			else if(ent == EntityType.CAVE_SPIDER)
 			{
-				fwdb.givePlayerPoints(name, 6);
+				rows = fwdb.givePlayerPoints(name, 6);
 			}
 			else if(ent == EntityType.ENDER_DRAGON)
 			{
-				fwdb.givePlayerPoints(name, 2500);
+				rows = fwdb.givePlayerPoints(name, 2500);
 			}
 			else if(ent == EntityType.WITHER)
 			{
-				fwdb.givePlayerPoints(name,  500);
+				rows = fwdb.givePlayerPoints(name,  500);
 			}
 			else if(ent == EntityType.BLAZE)
 			{
-				fwdb.givePlayerPoints(name, 5);
+				rows = fwdb.givePlayerPoints(name, 5);
 			}
 			else if(ent == EntityType.SKELETON)
 			{
@@ -142,11 +149,11 @@ public class FluffBlockDropListener implements Listener {
 				
 				if(s.getSkeletonType() == SkeletonType.WITHER)
 				{
-					fwdb.givePlayerPoints(name, 4);
+					rows = fwdb.givePlayerPoints(name, 4);
 				}
 				else
 				{
-					fwdb.givePlayerPoints(name, 1);
+					rows = fwdb.givePlayerPoints(name, 1);
 					
 					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
 					{
@@ -157,47 +164,51 @@ public class FluffBlockDropListener implements Listener {
 			}
 			else if(ent == EntityType.ZOMBIE)
 			{
-				fwdb.givePlayerPoints(name, 1);
+				rows = fwdb.givePlayerPoints(name, 1);
 			}
 			else if(ent == EntityType.CREEPER)
 			{
-				fwdb.givePlayerPoints(name, 2);
+				rows = fwdb.givePlayerPoints(name, 2);
 			}
 			else if(ent == EntityType.GHAST)
 			{
-				fwdb.givePlayerPoints(name, 6); //point count subject to change
+				rows = fwdb.givePlayerPoints(name, 6); //point count subject to change
 			}
 			else if(ent == EntityType.SPIDER)
 			{
 				long time = event.getEntity().getKiller().getWorld().getTime();
 				if(time > 12000 && time < 24000) //12000 = 6pm, 23999 = 5:59am
 				{
-					fwdb.givePlayerPoints(name, 1);
+					rows = fwdb.givePlayerPoints(name, 1);
 				}
 			}
 			else if(ent == EntityType.WITCH)
 			{
-				fwdb.givePlayerPoints(name, 3);
+				rows = fwdb.givePlayerPoints(name, 3);
 			}
 			else if(ent == EntityType.SILVERFISH)
 			{
-				fwdb.givePlayerPoints(name, 1);
+				rows = fwdb.givePlayerPoints(name, 1);
 			}
 			else if(ent == EntityType.ENDERMITE)
 			{
-				fwdb.givePlayerPoints(name, 1);
+				rows = fwdb.givePlayerPoints(name, 1);
 			}
 			else if(ent == EntityType.GUARDIAN)
 			{
 				Guardian g = (Guardian) event.getEntity();
 				if(g.isElder()) {
 					//The big boss Guardian
-					fwdb.givePlayerPoints(name, 350); //point count subject to change
+					rows = fwdb.givePlayerPoints(name, 350); //point count subject to change
 				}
 				else
 				{
-					fwdb.givePlayerPoints(name, 15); //point count subject to change
+					rows = fwdb.givePlayerPoints(name, 15); //point count subject to change
 				}
+			}
+			if(rows > 0)
+			{
+				fsb.refreshPlayerPoints(name);
 			}
 		}
 	}
@@ -237,9 +248,9 @@ public class FluffBlockDropListener implements Listener {
 			if(available_points > 0)
 			{
 				int points_taken = 0;
-				if(available_points > 50)
+				if(available_points > 100)
 				{
-					points_taken = 50;
+					points_taken = 100;
 				}
 				else
 				{
@@ -247,6 +258,8 @@ public class FluffBlockDropListener implements Listener {
 				}
 				fwdb.givePlayerPoints(killer.getName(), points_taken, false);
 				fwdb.subtractPlayerPoints(died.getName(), points_taken, false);
+				fsb.refreshPlayerPoints(killer.getName());
+				fsb.refreshPlayerPoints(died.getName());
 				event.setDeathMessage(event.getDeathMessage() + "; took " + points_taken + " points.");
 			}
 		}
@@ -257,15 +270,16 @@ public class FluffBlockDropListener implements Listener {
 			if(available_points > 0)
 			{
 				int points_taken = 0;
-				if(available_points > 10)
+				if(available_points > 100)
 				{
-					points_taken = 10;
+					points_taken = 100;
 				}
 				else
 				{
 					points_taken = available_points;
 				}
 				fwdb.subtractPlayerPoints(died.getName(), points_taken, false);
+				fsb.refreshPlayerPoints(died.getName());
 				event.setDeathMessage(event.getDeathMessage() + " and lost " + points_taken + " points.");
 			}
 			Bukkit.broadcastMessage(fwdb.getChatColor(died.getName()) + died.getName() + " " + ChatColor.RESET + "died at X: " + death_loc.getBlockX() + "  Y: " + death_loc.getBlockY() + "  Z: " + death_loc.getBlockZ());
@@ -278,17 +292,22 @@ public class FluffBlockDropListener implements Listener {
 		Material block = event.getItemType();
 		String name = event.getPlayer().getName();
 		int exp = event.getExpToDrop(); //getItemAmount() doesn't work for values > 1. We can get the # of items by getting the total EXP and dividing by EXP-per-item
+		int rows = 0;
 		if(block == Material.GOLD_INGOT)
 		{
 			double expPerItem = 1.0;
 			int amount = (int)Math.ceil(exp/expPerItem);
-			fwdb.givePlayerPoints(name, amount * 2);
+			rows = fwdb.givePlayerPoints(name, amount * 2);
 		}
 		else if(block == Material.IRON_INGOT)
 		{
 			double expPerItem = 0.7;
 			int amount = (int)Math.ceil(exp/expPerItem);
-			fwdb.givePlayerPoints(name, amount);
+			rows = fwdb.givePlayerPoints(name, amount);
+		}
+		if(rows > 0)
+		{
+			fsb.refreshPlayerPoints(name);
 		}
 	}
 	

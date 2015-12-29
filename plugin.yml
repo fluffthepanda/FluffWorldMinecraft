@@ -1,18 +1,18 @@
 main: world.fluff.FluffWorldIntegration
 name: FluffWorldIntegration
-version: 1.5.4
+version: 1.6
 author: Fluff
 description: Fluff's Plugin
 commands:
   points:
-    description: (FWMC) Displays your FWMC points
-    usage: /points
+    description: (FWMC) Displays FWMC points
+    usage: /points [MCusername]
   chatcolor:
     description: (FWMC) Changes your color in the chat
-    usage: /chatcolor color
+    usage: /chatcolor <color>
   coords:
     description: (FWMC) Broadcast your coordinates
     usage: /coords
   register:
     description: (FWMC) Link your FW account
-    usage: /register FWusername
+    usage: /register <FWusername>
