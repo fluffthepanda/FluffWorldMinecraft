@@ -43,7 +43,7 @@ public class FluffWorldIntegration extends JavaPlugin {
         		{
         			//the requested user is in the database
         			int p = fwdb.getPlayerPoints(args[0]);
-                    sender.sendMessage("Player "+args[0]+" has " + p + " FWMC points.");
+                    sender.sendMessage("Player "+fwdb.getChatColor(args[0])+args[0]+ChatColor.RESET+" has " + p + " FWMC points.");
                     return true;
         		}
         		else 
