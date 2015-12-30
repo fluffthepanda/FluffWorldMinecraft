@@ -189,6 +189,7 @@ public class FluffWorldIntegration extends JavaPlugin {
             				lore.add("This piece of paper is redeemabled");
             				lore.add("for actual Fluff World MC points.");
             				lore.add("Worth: "+ChatColor.WHITE+""+ChatColor.BOLD+attemptedWithdrawal+" points");
+            				lore.add("Right-click to redeem these points.");
             				//lore.add("Ticket issued to: "+fwdb.getChatColor(player.getName()));
             				lore.add("Ticket issued to: "+player.getName());
             				ticketMeta.setLore(lore);

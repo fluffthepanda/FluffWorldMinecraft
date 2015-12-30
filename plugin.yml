@@ -17,5 +17,5 @@ commands:
     description: (FWMC) Link your FW account
     usage: /register <FWusername>
   withdraw:
-    description: (FWMC) Withdrawl FWMC points into a  FWMC Points Ticket item
+    description: (FWMC) Withdrawl FWMC points into a FWMC Points Ticket item
     usage: /withdraw <points to withdraw>
