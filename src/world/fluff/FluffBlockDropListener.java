@@ -129,7 +129,7 @@ public class FluffBlockDropListener implements Listener {
 	{
 		if(event.getEntity().getKiller() != null)
 		{
-			//Player player = event.getEntity().getKiller().getPlayer();
+			Player player = event.getEntity().getKiller().getPlayer();
 			String name = event.getEntity().getKiller().getName();
 			EntityType ent = event.getEntity().getType();
 			int rows = 0;
@@ -165,10 +165,20 @@ public class FluffBlockDropListener implements Listener {
 				{
 					rows = fwdb.givePlayerPoints(name, 1);
 					
-					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+					if(player.getInventory().getItemInHand().containsEnchantment(Enchantment.LOOT_BONUS_MOBS)) //has Looting enchantment
 					{
-						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-2 gunpowder.
-						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
+						if(ThreadLocalRandom.current().nextInt(3) == 2) //33% chance of dropping
+						{
+							//Skeletons will drop 0-3 gunpowder.
+							event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+						}
+					}
+					else {
+						if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+						{
+							//Skeletons will drop 0-2 gunpowder.
+							event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
+						}
 					}
 				}
 			}
