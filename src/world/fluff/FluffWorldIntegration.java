@@ -167,8 +167,8 @@ public class FluffWorldIntegration extends JavaPlugin {
             		try 
             		{
             			int attemptedWithdrawal = Integer.parseInt(args[0]);
-            			//int currentStoredPoints = fwdb.getPlayerPoints(sender.getName());
-            			int currentStoredPoints = 1000; //Temporary value because I can't use the database
+            			int currentStoredPoints = fwdb.getPlayerPoints(sender.getName());
+            			//int currentStoredPoints = 1000; //Temporary value because I can't use the database
             			
             			//If the player doesn't have enough points
             			if(currentStoredPoints < attemptedWithdrawal)
@@ -195,8 +195,8 @@ public class FluffWorldIntegration extends JavaPlugin {
             				lore.add("for actual Fluff World MC points.");
             				lore.add("Worth: "+ChatColor.WHITE+""+ChatColor.BOLD+attemptedWithdrawal+" points");
             				lore.add("Right-click to redeem these points.");
-            				//lore.add("Ticket issued to: "+fwdb.getChatColor(player.getName()));
-            				lore.add("Ticket issued to: "+player.getName());
+            				lore.add("Ticket issued to: "+fwdb.getChatColor(player.getName()));
+            				//lore.add("Ticket issued to: "+player.getName());
             				ticketMeta.setLore(lore);
             				
             				ticket.setItemMeta(ticketMeta);
@@ -229,7 +229,7 @@ public class FluffWorldIntegration extends JavaPlugin {
             		        }
             		        else
             		        {
-            		        	//fwdb.subtractPlayerPoints(((Player)sender).getName(), attemptedWithdrawal);
+            		        	fwdb.subtractPlayerPoints(((Player)sender).getName(), attemptedWithdrawal);
             		        	System.out.println("Player "+((Player)sender).getName()+" had "+attemptedWithdrawal+" points subtracted via Ticket withdrawal.");
             		        	player.getInventory().addItem(ticket);
             		        	System.out.println("Granted player "+((Player)sender).getName()+" a FWMC Points Ticket for: "+attemptedWithdrawal+" points.");
