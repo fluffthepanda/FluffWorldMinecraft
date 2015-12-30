@@ -1,6 +1,6 @@
 main: world.fluff.FluffWorldIntegration
 name: FluffWorldIntegration
-version: 1.6
+version: 1.7
 author: Fluff
 description: Fluff's Plugin
 commands:
