@@ -59,4 +59,9 @@ public class FluffsScoreboard {
 	{
 		fwScoreboard.getObjective("XP").getScore(player.getName()).setScore(player.getLevel());
 	}
+	
+	public void removePlayerFromSidebar(String name)
+	{
+		fwScoreboard.resetScores(fwdb.getChatColor(name) + name);
+	}
 }

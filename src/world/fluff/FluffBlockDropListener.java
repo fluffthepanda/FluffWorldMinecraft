@@ -13,6 +13,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -60,6 +61,15 @@ public class FluffBlockDropListener implements Listener {
 		fsb.refreshPlayerXP(player);
 		fsb.refreshPlayerPoints(player.getName());
 	}
+	
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent event)
+	{
+		String name = event.getPlayer().getName();
+		fsb.removePlayerFromSidebar(name);
+		event.setQuitMessage(fwdb.getChatColor(name) + name + ChatColor.YELLOW + " left the game.");
+	}
+	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event)
 	{
