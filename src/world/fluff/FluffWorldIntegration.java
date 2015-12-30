@@ -74,6 +74,15 @@ public class FluffWorldIntegration extends JavaPlugin {
         		}
         		if(color != null)
         		{
+        			/*try{
+    					fsb.removePlayerFromSidebar(sender.getName());
+    				}
+    				catch(Exception ex){}
+    				try{
+    					fsb.removePlayerFromSidebar(fwdb.getChatColor(sender.getName()) + sender.getName());
+    				}
+    				catch(Exception ex){}*/
+        			fsb.removePlayerFromSidebar(sender.getServer().getPlayer(sender.getName()).getDisplayName()); //Name should include current color formatting
         			if(fwdb.changeChatColor(sender.getName(), args[0].toUpperCase()) == 1)
         			{
         				sender.getServer().getPlayer(sender.getName()).setDisplayName(color + sender.getName() + ChatColor.RESET);
