@@ -68,6 +68,12 @@ public class FluffBlockDropListener implements Listener {
 		player.setScoreboard(fsb.getScoreboard()); //set custom scoreboard (XP tracker)
 		fsb.refreshPlayerXP(player);
 		fsb.refreshPlayerPoints(player.getName());
+		
+		//After everything else is good to go, let's get that bed compass fired up again
+		/*if(event.getPlayer().getBedSpawnLocation() != null)
+		{
+			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
+		}*/
 	}
 	
 	@EventHandler
@@ -342,8 +348,11 @@ public class FluffBlockDropListener implements Listener {
 	@EventHandler
 	public void onPlayerLeftBed(PlayerBedLeaveEvent event)
 	{
-		event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
-		event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
+		/*if(event.getPlayer().getBedSpawnLocation() != null)
+		{
+			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
+			event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
+		}*/
 	}
 	
 	@EventHandler
