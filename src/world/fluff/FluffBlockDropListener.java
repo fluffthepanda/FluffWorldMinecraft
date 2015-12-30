@@ -23,6 +23,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
@@ -329,6 +330,13 @@ public class FluffBlockDropListener implements Listener {
 		{
 			fsb.refreshPlayerPoints(name);
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerLeftBed(PlayerBedLeaveEvent event)
+	{
+		event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
+		event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
 	}
 	
 }
