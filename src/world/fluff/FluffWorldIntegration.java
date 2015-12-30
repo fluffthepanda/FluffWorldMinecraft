@@ -142,6 +142,45 @@ public class FluffWorldIntegration extends JavaPlugin {
         		}
         	}
         }
+        else if(command.getName().equalsIgnoreCase("withdraw"))
+        {
+        	if(args.length == 0)
+        	{
+        		sender.sendMessage("You must provide an amount of points to withdraw.");
+        		return false;
+        	}
+        	else
+        	{
+        		try 
+        		{
+        			int attemptedWithdrawal = Integer.parseInt(args[0]);
+        			//int currentStoredPoints = fwdb.getPlayerPoints(sender.getName());
+        			int currentStoredPoints = 1000; //Temporary value because I can't use the database
+        			
+        			//If the player doesn't have enough points
+        			if(currentStoredPoints < attemptedWithdrawal)
+        			{
+        				sender.sendMessage("You don't have enough points to withdraw "+ChatColor.GOLD+attemptedWithdrawal+" points"+ChatColor.RESET+" You currently have "+ChatColor.GOLD+currentStoredPoints+" points"+ChatColor.RESET+".");
+                		return true;
+        			}
+        			else 
+        			{
+        				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), generateTicketCommandString(sender.getServer().getPlayer(sender.getName()), 45));
+        			}
+        			
+        		}
+        		catch(NumberFormatException e)
+        		{
+        			sender.sendMessage("That's not a valid integer number.");
+            		return false;
+        		}
+        	}
+        }
         return false;
+    }
+    
+    public String generateTicketCommandString(Player player, int pointValue)
+    {
+    	return "give "+player.getName()+" minecraft:paper 1 0 {display: {Name: \"Fluff World Points Ticket\",Lore: [\"This piece of paper is redeemable\",\"for actual Fluff World MC points.\",\"Worth: "+ChatColor.WHITE+ChatColor.BOLD+Integer.toString(pointValue)+" points"+ChatColor.RESET+"\",\"Ticket given to: "+player.getDisplayName()+"\"]},ench:[],item:{tag:{FWMCPointValue:"+Integer.toString(pointValue)+"}}}";
     }
 }
