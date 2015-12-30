@@ -360,16 +360,55 @@ public class FluffBlockDropListener implements Listener {
 	    	NBTCompound ticketNBT = manager.read(ticket);
 	    	
 	    	System.out.println(ticketNBT);
-	    	System.out.println(ticketNBT.containsKey("item"));
-	    	System.out.println(ticketNBT.getCompound("item").containsKey("tag"));
-	    	System.out.println(ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"));
 	    	
-	    	//If the ticket has the 'item' compound and the FWMCTicketPointValue compound
+	    	//If the ticket has the FWMCTicketPointValue integer
 	    	if(ticketNBT.containsKey("item") && ticketNBT.getCompound("item").containsKey("tag") && ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
 	    	{
-	    		//Check to make sure the value in the compound is valid
-	    		int pointValue = (Integer) ticketNBT.getCompound("item").get("FWMCTicketPointValue");
-	    		System.out.println("Integer value of redeemed points: "+pointValue);
+	    		int pointValue = -1;
+	    		try
+	    		{
+	    			//Check to make sure the value in the compound is valid
+	    			pointValue = (Integer) ticketNBT.getCompound("item").getCompound("tag").get("FWMCTicketPointValue");
+	    			
+	    		}
+	    		catch(NumberFormatException e)
+	    		{
+	    			player.sendMessage(ChatColor.RED+"This ticket has an invalid point value. Contact the server admin.");
+	    			pointValue = -1;
+	    		}
+	    		if(pointValue != -1) 
+	    		{
+	    			
+	    			/*
+	    			 * 
+	    			 * ItemStack m = new ItemStack(Material.SULPHUR, 1);
+if(player.getInventory().contains(Material.SULPHUR)){
+player.getInventory().removeItem(m);
+player.updateInventory();
+	    			 */
+	    			
+	    			//Hopefully, remove one instance of an item
+	    			if(ticket.getAmount() > 1)
+	    			{
+	    				ticket.setAmount(ticket.getAmount()-1);
+	    				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), ticket);
+	    			}
+	    			else
+	    			{
+	    				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
+	    			}
+	    			
+		        	System.out.println("Player "+player.getName()+" redeemed a FWMC Points Ticket for: "+pointValue+" points.");
+		        	//fwdb.givePlayerPoints(player.getName(), pointValue);
+		        	System.out.println("Player "+player.getName()+" had "+pointValue+" points added via Ticket redemption.");
+		        	
+		        	player.sendMessage(ChatColor.GREEN+""+pointValue+" points redeemed.");
+	    		}
+	    		
+	    		
+	    		
+	    		
+	    		
 	    	}
 	    	
 	    }
