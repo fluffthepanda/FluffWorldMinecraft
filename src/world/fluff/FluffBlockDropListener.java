@@ -15,6 +15,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+
+import me.dpohvar.powernbt.PowerNBT;
+import me.dpohvar.powernbt.api.NBTCompound;
+import me.dpohvar.powernbt.api.NBTManager;
+
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -22,6 +28,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
@@ -337,6 +344,36 @@ public class FluffBlockDropListener implements Listener {
 	{
 		event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
 		event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
+	}
+	
+	@EventHandler
+	public void onPlayerUse(PlayerInteractEvent event){
+	    Player player = event.getPlayer();
+	 
+	    //If the player right clicks in the air with paper (a Ticket)
+	    if(player.getItemInHand().getType() == Material.PAPER && event.getAction() == Action.RIGHT_CLICK_AIR)
+	    {
+	    	System.out.println(player.getName()+" is attempting to redeem a piece of paper.");
+	    	
+	    	ItemStack ticket = new ItemStack(player.getItemInHand());
+	    	NBTManager manager = PowerNBT.getApi();
+	    	NBTCompound ticketNBT = manager.read(ticket);
+	    	
+	    	System.out.println(ticketNBT);
+	    	System.out.println(ticketNBT.containsKey("item"));
+	    	System.out.println(ticketNBT.getCompound("item").containsKey("tag"));
+	    	System.out.println(ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"));
+	    	
+	    	//If the ticket has the 'item' compound and the FWMCTicketPointValue compound
+	    	if(ticketNBT.containsKey("item") && ticketNBT.getCompound("item").containsKey("tag") && ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
+	    	{
+	    		//Check to make sure the value in the compound is valid
+	    		int pointValue = (Integer) ticketNBT.getCompound("item").get("FWMCTicketPointValue");
+	    		System.out.println("Integer value of redeemed points: "+pointValue);
+	    	}
+	    	
+	    }
+	    
 	}
 	
 }

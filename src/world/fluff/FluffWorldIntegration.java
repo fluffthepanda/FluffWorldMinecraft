@@ -184,6 +184,7 @@ public class FluffWorldIntegration extends JavaPlugin {
             				ItemStack ticket = new ItemStack(Material.PAPER);
             				ItemMeta ticketMeta = ticket.getItemMeta();
             				
+            				//Uses Bukkit methods to customize the item
             				ticketMeta.setDisplayName(ChatColor.GREEN+""+ChatColor.BOLD+"Fluff World Points Ticket");
             				List<String> lore = new ArrayList<String>();
             				lore.add("This piece of paper is redeemabled");
@@ -193,21 +194,28 @@ public class FluffWorldIntegration extends JavaPlugin {
             				//lore.add("Ticket issued to: "+fwdb.getChatColor(player.getName()));
             				lore.add("Ticket issued to: "+player.getName());
             				ticketMeta.setLore(lore);
+            				
             				ticket.setItemMeta(ticketMeta);
+            				
+            				//Bukkit won't let us modify the NBT directly (what we need to do to store custom metadata), so we have to use a library.
+            				//Follows NBT structure as listed here: http://minecraft.gamepedia.com/Tutorials/Command_NBT_tags
             				
             				//Gets the ticket item's NBT data
             				NBTCompound ticketNBT = manager.read(ticket);
             				
-            				//Gives item a glow effect without actually giving it an enchantment
+            				//Gives item a glow effect by giving it an empty "ench" (enchantment) list of enchantments
             				ticketNBT.put("ench", new NBTList());
             				
-            				//Apply custom NBT tab that contains the points
+            				//Apply custom NBT tag that contains the points (custom NBT tags go under the item.tag compound)
             				ticketNBT.put("item", new NBTCompound());
-            				NBTCompound customTags = (NBTCompound) ticketNBT.get("item");
-            				customTags.put("FWMCTicketPointValue", attemptedWithdrawal);
+            				ticketNBT.getCompound("item").put("tag", new NBTCompound());
+            				ticketNBT.getCompound("item").getCompound("tag").put("FWMCTicketPointValue", attemptedWithdrawal);
            		 
-            				//Prints out the mojangson (pseudo-JSON) string of NBT data
+            				//Prints out the mojangson (pseudo-JSON) string of NBT data for inspection
             				System.out.println(ticketNBT);
+            				
+            				//Applies the NBT data to the item
+            				manager.write(ticket, ticketNBT);
             				
             				//If the player has no room in their inventory
             		        if(player.getInventory().firstEmpty() == -1)
@@ -217,7 +225,11 @@ public class FluffWorldIntegration extends JavaPlugin {
             		        }
             		        else
             		        {
+            		        	//fwdb.subtractPlayerPoints(((Player)sender).getName(), attemptedWithdrawal);
+            		        	System.out.println("Player "+((Player)sender).getName()+" had "+attemptedWithdrawal+" points subtracted via Ticket withdrawal.");
             		        	player.getInventory().addItem(ticket);
+            		        	System.out.println("Granted player "+((Player)sender).getName()+" a FWMC Points Ticket for: "+attemptedWithdrawal+" points.");
+            		        	sender.sendMessage(ChatColor.GREEN+"Here's your ticket for: "+attemptedWithdrawal+" points. Don't lose it.");
             		        	return true;
             		        }
             			}
