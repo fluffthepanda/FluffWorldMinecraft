@@ -347,7 +347,8 @@ public class FluffBlockDropListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerUse(PlayerInteractEvent event){
+	public void onPlayerUse(PlayerInteractEvent event)
+	{
 	    Player player = event.getPlayer();
 	 
 	    //If the player right clicks in the air with paper (a Ticket)
@@ -359,7 +360,8 @@ public class FluffBlockDropListener implements Listener {
 	    	NBTManager manager = PowerNBT.getApi();
 	    	NBTCompound ticketNBT = manager.read(ticket);
 	    	
-	    	System.out.println(ticketNBT);
+	    	//Prints out the mojangson (pseudo-JSON) string of NBT data for inspection
+	    	//System.out.println(ticketNBT);
 	    	
 	    	//If the ticket has the FWMCTicketPointValue integer
 	    	if(ticketNBT.containsKey("item") && ticketNBT.getCompound("item").containsKey("tag") && ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
@@ -369,7 +371,6 @@ public class FluffBlockDropListener implements Listener {
 	    		{
 	    			//Check to make sure the value in the compound is valid
 	    			pointValue = (Integer) ticketNBT.getCompound("item").getCompound("tag").get("FWMCTicketPointValue");
-	    			
 	    		}
 	    		catch(NumberFormatException e)
 	    		{
@@ -378,16 +379,7 @@ public class FluffBlockDropListener implements Listener {
 	    		}
 	    		if(pointValue != -1) 
 	    		{
-	    			
-	    			/*
-	    			 * 
-	    			 * ItemStack m = new ItemStack(Material.SULPHUR, 1);
-if(player.getInventory().contains(Material.SULPHUR)){
-player.getInventory().removeItem(m);
-player.updateInventory();
-	    			 */
-	    			
-	    			//Hopefully, remove one instance of an item
+	    			//Remove one instance of an item from the stack
 	    			if(ticket.getAmount() > 1)
 	    			{
 	    				ticket.setAmount(ticket.getAmount()-1);
@@ -404,15 +396,7 @@ player.updateInventory();
 		        	
 		        	player.sendMessage(ChatColor.GREEN+""+pointValue+" points redeemed.");
 	    		}
-	    		
-	    		
-	    		
-	    		
-	    		
 	    	}
-	    	
 	    }
-	    
 	}
-	
 }
