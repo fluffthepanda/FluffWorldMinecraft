@@ -26,6 +26,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -375,7 +376,7 @@ public class FluffBlockDropListener implements Listener {
 	    	//If the ticket has the FWMCTicketPointValue integer
 	    	if(ticketNBT.containsKey("item") && ticketNBT.getCompound("item").containsKey("tag") && ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
 	    	{
-	    		int pointValue = -1;
+	    		int pointValue;
 	    		try
 	    		{
 	    			//Check to make sure the value in the compound is valid
@@ -386,7 +387,11 @@ public class FluffBlockDropListener implements Listener {
 	    			player.sendMessage(ChatColor.RED+"This ticket has an invalid point value. Contact the server admin.");
 	    			pointValue = -1;
 	    		}
-	    		if(pointValue != -1) 
+	    		if(pointValue <= 0)
+	    		{
+	    			player.sendMessage(ChatColor.RED+"This ticket has an invalid point value. Contact the server admin.");
+	    		}
+	    		else if(pointValue > 0) 
 	    		{
 	    			//Remove one instance of an item from the stack
 	    			if(ticket.getAmount() > 1)
@@ -407,5 +412,49 @@ public class FluffBlockDropListener implements Listener {
 	    		}
 	    	}
 	    }
+	}
+	
+	@EventHandler
+	public void onPlayerCraftItem(CraftItemEvent event)
+	{
+    	//If the player tries to craft something with paper
+		if(event.getInventory().contains(Material.PAPER))
+		{
+			NBTManager manager = PowerNBT.getApi();
+			for(ItemStack item : event.getInventory())
+			{
+				if(item == null)
+				{
+					//
+				}
+				else
+				{
+					//System.out.println(item);
+					NBTCompound nbtData = manager.read(item);
+					if(nbtData == null)
+					{
+						//System.out.println("No NBT data here.");
+					}
+					else
+					{
+						if(nbtData.containsKey("item"))
+						{
+							if(nbtData.getCompound("item").containsKey("tag"))
+							{
+								if(nbtData.getCompound("item").getCompound("tag") != null)
+								{
+									if(nbtData.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
+									{
+										//This is a FWMC Potions Ticket, so we don't want them to try and craft with it by mistake
+										event.setCancelled(true);
+										event.getWhoClicked().sendMessage(ChatColor.YELLOW+"You cannot craft using a FWMC Points Ticket.");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
