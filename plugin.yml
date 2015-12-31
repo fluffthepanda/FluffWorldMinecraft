@@ -1,6 +1,6 @@
 main: world.fluff.FluffWorldIntegration
 name: FluffWorldIntegration
-version: 1.7.1
+version: 1.7.2
 author: Fluff
 description: Fluff's Plugin
 commands:
@@ -19,3 +19,6 @@ commands:
   withdraw:
     description: (FWMC) Withdraw FWMC points into a FWMC Points Ticket item
     usage: /withdraw <points to withdraw>
+  bedspawn:
+    description: (FWMC) Get the coordinates of your bed spawn's location, or broadcast it to other players
+    usage: /bedspawn [broadcast]

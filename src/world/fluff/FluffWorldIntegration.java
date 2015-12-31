@@ -195,8 +195,7 @@ public class FluffWorldIntegration extends JavaPlugin {
             				lore.add("for actual Fluff World MC points.");
             				lore.add("Worth: "+ChatColor.WHITE+""+ChatColor.BOLD+attemptedWithdrawal+" points");
             				lore.add("Right-click to redeem these points.");
-            				lore.add("Ticket issued to: "+fwdb.getChatColor(player.getName()));
-            				//lore.add("Ticket issued to: "+player.getName());
+            				lore.add("Ticket issued to: "+player.getName());
             				ticketMeta.setLore(lore);
             				
             				ticket.setItemMeta(ticketMeta);
@@ -246,6 +245,50 @@ public class FluffWorldIntegration extends JavaPlugin {
                 		return false;
             		}
             	}
+            }
+            else if(command.getName().equalsIgnoreCase("bedspawn"))
+            {
+            	try 
+            	{
+            		Player p = sender.getServer().getPlayer(sender.getName());
+                	Location bukkit_bed = p.getBedSpawnLocation();
+                	ChatColor color = fwdb.getChatColor(sender.getName());
+                	//ChatColor color = ChatColor.WHITE; //Temporary value because I can't use the database
+                	
+                	if(args.length == 0)
+                	{
+                		if(p.getPlayer().getBedSpawnLocation() == null)
+                    	{
+                			//Player doesn't have any record of a bed
+                    		p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Couldn't locate your home bed.");
+        					p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"To fix this message, try sleeping in your bed again.");
+                    	}
+                		else
+                		{
+                			sender.sendMessage(color + "Your bed:" + ChatColor.RESET + " X: " + bukkit_bed.getBlockX() + "  Y: " + bukkit_bed.getBlockY() + "  Z: " + bukkit_bed.getBlockZ());
+                		}
+                	}
+                	else if(args[0].equals("broadcast"))
+                	{
+                		if(p.getPlayer().getBedSpawnLocation() == null)
+                    	{
+                    		
+                			//Player doesn't have any record of a bed
+                    		p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Couldn't locate your home bed.");
+        					p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"To fix this message, try sleeping in your bed again.");			
+                    	}
+                		else
+                		{
+                			Bukkit.broadcastMessage(color + p.getName() +"'s bed:" + ChatColor.RESET + " X: " + bukkit_bed.getBlockX() + "  Y: " + bukkit_bed.getBlockY() + "  Z: " + bukkit_bed.getBlockZ());
+                		}
+                	}
+            	}
+            	catch(Exception e)
+            	{
+            		sender.sendMessage("Sorry, only online users may use this command.");
+            		return false;
+            	}
+            	return true;
             }
         }
         return false;
