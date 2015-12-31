@@ -15,14 +15,23 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
+
+import me.dpohvar.powernbt.PowerNBT;
+import me.dpohvar.powernbt.api.NBTCompound;
+import me.dpohvar.powernbt.api.NBTManager;
+
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
@@ -60,6 +69,12 @@ public class FluffBlockDropListener implements Listener {
 		player.setScoreboard(fsb.getScoreboard()); //set custom scoreboard (XP tracker)
 		fsb.refreshPlayerXP(player);
 		fsb.refreshPlayerPoints(player.getName());
+		
+		//After everything else is good to go, let's get that bed compass fired up again
+		/*if(event.getPlayer().getBedSpawnLocation() != null)
+		{
+			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
+		}*/
 	}
 	
 	@EventHandler
@@ -129,7 +144,7 @@ public class FluffBlockDropListener implements Listener {
 	{
 		if(event.getEntity().getKiller() != null)
 		{
-			//Player player = event.getEntity().getKiller().getPlayer();
+			Player player = event.getEntity().getKiller().getPlayer();
 			String name = event.getEntity().getKiller().getName();
 			EntityType ent = event.getEntity().getType();
 			int rows = 0;
@@ -165,10 +180,20 @@ public class FluffBlockDropListener implements Listener {
 				{
 					rows = fwdb.givePlayerPoints(name, 1);
 					
-					if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+					if(player.getInventory().getItemInHand().containsEnchantment(Enchantment.LOOT_BONUS_MOBS)) //has Looting enchantment
 					{
-						//Without creepers, we need a source for gunpowder. Skeletons will drop 0-2 gunpowder.
-						event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
+						if(ThreadLocalRandom.current().nextInt(3) == 2) //33% chance of dropping
+						{
+							//Skeletons will drop 0-3 gunpowder.
+							event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(4)));
+						}
+					}
+					else {
+						if(ThreadLocalRandom.current().nextInt(5) == 3) //20% chance of dropping
+						{
+							//Skeletons will drop 0-2 gunpowder.
+							event.getDrops().add(new ItemStack(Material.SULPHUR, ThreadLocalRandom.current().nextInt(3)));
+						}
 					}
 				}
 			}
@@ -321,4 +346,115 @@ public class FluffBlockDropListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerLeftBed(PlayerBedLeaveEvent event)
+	{
+		/*if(event.getPlayer().getBedSpawnLocation() != null)
+		{
+			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
+			event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
+		}*/
+	}
+	
+	@EventHandler
+	public void onPlayerUse(PlayerInteractEvent event)
+	{
+	    Player player = event.getPlayer();
+	 
+	    //If the player right clicks in the air with paper (a Ticket)
+	    if(player.getItemInHand().getType() == Material.PAPER && event.getAction() == Action.RIGHT_CLICK_AIR)
+	    {
+	    	System.out.println(player.getName()+" is attempting to redeem a piece of paper.");
+	    	
+	    	ItemStack ticket = new ItemStack(player.getItemInHand());
+	    	NBTManager manager = PowerNBT.getApi();
+	    	NBTCompound ticketNBT = manager.read(ticket);
+	    	
+	    	//Prints out the mojangson (pseudo-JSON) string of NBT data for inspection
+	    	//System.out.println(ticketNBT);
+	    	
+	    	//If the ticket has the FWMCTicketPointValue integer
+	    	if(ticketNBT.containsKey("item") && ticketNBT.getCompound("item").containsKey("tag") && ticketNBT.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
+	    	{
+	    		int pointValue;
+	    		try
+	    		{
+	    			//Check to make sure the value in the compound is valid
+	    			pointValue = (Integer) ticketNBT.getCompound("item").getCompound("tag").get("FWMCTicketPointValue");
+	    		}
+	    		catch(NumberFormatException e)
+	    		{
+	    			player.sendMessage(ChatColor.RED+"This ticket has an invalid point value. Contact the server admin.");
+	    			pointValue = -1;
+	    		}
+	    		if(pointValue <= 0)
+	    		{
+	    			player.sendMessage(ChatColor.RED+"This ticket has an invalid point value. Contact the server admin.");
+	    		}
+	    		else if(pointValue > 0) 
+	    		{
+	    			//Remove one instance of an item from the stack
+	    			if(ticket.getAmount() > 1)
+	    			{
+	    				ticket.setAmount(ticket.getAmount()-1);
+	    				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), ticket);
+	    			}
+	    			else
+	    			{
+	    				player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));
+	    			}
+	    			
+		        	System.out.println("Player "+player.getName()+" redeemed a FWMC Points Ticket for: "+pointValue+" points.");
+		        	fwdb.givePlayerPoints(player.getName(), pointValue);
+		        	System.out.println("Player "+player.getName()+" had "+pointValue+" points added via Ticket redemption.");
+		        	
+		        	player.sendMessage(ChatColor.GREEN+""+pointValue+" points redeemed.");
+	    		}
+	    	}
+	    }
+	}
+	
+	@EventHandler
+	public void onPlayerCraftItem(CraftItemEvent event)
+	{
+    	//If the player tries to craft something with paper
+		if(event.getInventory().contains(Material.PAPER))
+		{
+			NBTManager manager = PowerNBT.getApi();
+			for(ItemStack item : event.getInventory())
+			{
+				if(item == null)
+				{
+					//
+				}
+				else
+				{
+					//System.out.println(item);
+					NBTCompound nbtData = manager.read(item);
+					if(nbtData == null)
+					{
+						//System.out.println("No NBT data here.");
+					}
+					else
+					{
+						if(nbtData.containsKey("item"))
+						{
+							if(nbtData.getCompound("item").containsKey("tag"))
+							{
+								if(nbtData.getCompound("item").getCompound("tag") != null)
+								{
+									if(nbtData.getCompound("item").getCompound("tag").containsKey("FWMCTicketPointValue"))
+									{
+										//This is a FWMC Potions Ticket, so we don't want them to try and craft with it by mistake
+										event.setCancelled(true);
+										event.getWhoClicked().sendMessage(ChatColor.YELLOW+"You cannot craft using a FWMC Points Ticket.");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
