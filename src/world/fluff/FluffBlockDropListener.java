@@ -407,7 +407,7 @@ public class FluffBlockDropListener implements Listener {
 		        	System.out.println("Player "+player.getName()+" redeemed a FWMC Points Ticket for: "+pointValue+" points.");
 		        	fwdb.givePlayerPoints(player.getName(), pointValue);
 		        	System.out.println("Player "+player.getName()+" had "+pointValue+" points added via Ticket redemption.");
-		        	
+		        	fsb.refreshPlayerPoints(player.getName());
 		        	player.sendMessage(ChatColor.GREEN+""+pointValue+" points redeemed.");
 	    		}
 	    	}

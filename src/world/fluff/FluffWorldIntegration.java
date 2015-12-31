@@ -234,6 +234,7 @@ public class FluffWorldIntegration extends JavaPlugin {
             		        	player.getInventory().addItem(ticket);
             		        	System.out.println("Granted player "+((Player)sender).getName()+" a FWMC Points Ticket for: "+attemptedWithdrawal+" points.");
             		        	sender.sendMessage(ChatColor.GREEN+"Here's your ticket for: "+attemptedWithdrawal+" points. Don't lose it.");
+            		        	fsb.refreshPlayerPoints(((Player)sender).getName());
             		        	return true;
             		        }
             			}
