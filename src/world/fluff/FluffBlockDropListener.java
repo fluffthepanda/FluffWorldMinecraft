@@ -26,6 +26,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -34,12 +35,14 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
 
 public class FluffBlockDropListener implements Listener {
 	FWDBConnection fwdb;
 	FluffsScoreboard fsb;
+	ArrayList<Integer> mobsFromSpawnBlocks = new ArrayList<Integer>();
 	public FluffBlockDropListener(FWDBConnection conn, FluffsScoreboard fwScoreboard)
 	{
 		fwdb = conn;
@@ -151,6 +154,11 @@ public class FluffBlockDropListener implements Listener {
 	@EventHandler
 	public void onCreatureKill(EntityDeathEvent event)
 	{
+		if(mobsFromSpawnBlocks.contains((Integer)event.getEntity().getEntityId()))
+		{
+			mobsFromSpawnBlocks.remove((Integer)event.getEntity().getEntityId());
+			return;
+		}
 		if(event.getEntity().getKiller() != null)
 		{
 			Player player = event.getEntity().getKiller().getPlayer();
@@ -353,6 +361,12 @@ public class FluffBlockDropListener implements Listener {
 		{
 			fsb.refreshPlayerPoints(name);
 		}
+	}
+	
+	@EventHandler
+	public void onSpawnerSpawn(SpawnerSpawnEvent event)
+	{
+		mobsFromSpawnBlocks.add(event.getEntity().getEntityId());
 	}
 	
 	@EventHandler
