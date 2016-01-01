@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
+
 import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
 
@@ -51,6 +52,7 @@ public class FluffBlockDropListener implements Listener {
 		//checkConnection() tries to read a dummy value from the database
 		//The JDBC driver in FWDBConnection.java is set to autoReconnect=true
 		//If checkConnection fails, the driver automatically knows to reconnect, so the next DB access attempt will have a live connection.
+		
 		if(!fwdb.checkConnection())
 		{
 			Bukkit.broadcastMessage(ChatColor.RED + "Database connection timed out. " + ChatColor.GREEN + "Reconnecting..." + ChatColor.RESET);
@@ -71,10 +73,17 @@ public class FluffBlockDropListener implements Listener {
 		fsb.refreshPlayerPoints(player.getName());
 		
 		//After everything else is good to go, let's get that bed compass fired up again
-		/*if(event.getPlayer().getBedSpawnLocation() != null)
+		if(event.getPlayer().getBedSpawnLocation() != null)
 		{
 			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
-		}*/
+		}
+		else
+		{
+			if(event.getPlayer().getInventory().contains(Material.COMPASS))
+			{
+				event.getPlayer().sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Couldn't locate your home bed. Your compass will not point to it.");
+			}
+		}
 	}
 	
 	@EventHandler
@@ -349,11 +358,9 @@ public class FluffBlockDropListener implements Listener {
 	@EventHandler
 	public void onPlayerLeftBed(PlayerBedLeaveEvent event)
 	{
-		/*if(event.getPlayer().getBedSpawnLocation() != null)
-		{
-			event.getPlayer().setCompassTarget(event.getPlayer().getBedSpawnLocation());
-			event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
-		}*/
+		event.getPlayer().setCompassTarget(event.getPlayer().getLocation());
+		event.getPlayer().setBedSpawnLocation(event.getPlayer().getLocation());
+		event.getPlayer().sendMessage(ChatColor.GREEN+"Your compass will now point to this bed.");
 	}
 	
 	@EventHandler
@@ -364,7 +371,6 @@ public class FluffBlockDropListener implements Listener {
 	    //If the player right clicks in the air with paper (a Ticket)
 	    if(player.getItemInHand().getType() == Material.PAPER && event.getAction() == Action.RIGHT_CLICK_AIR)
 	    {
-	    	System.out.println(player.getName()+" is attempting to redeem a piece of paper.");
 	    	
 	    	ItemStack ticket = new ItemStack(player.getItemInHand());
 	    	NBTManager manager = PowerNBT.getApi();
