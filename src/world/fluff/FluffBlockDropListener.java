@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
@@ -24,6 +25,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -167,7 +169,14 @@ public class FluffBlockDropListener implements Listener {
 			int rows = 0;
 			if(ent == EntityType.ENDERMAN)
 			{
-				rows = fwdb.givePlayerPoints(name, 8);
+				if(player.getWorld().getEnvironment().equals(World.Environment.THE_END))
+				{
+					rows = fwdb.givePlayerPoints(name, 2);
+				}
+				else
+				{
+					rows = fwdb.givePlayerPoints(name, 8);
+				}
 			}
 			else if(ent == EntityType.CAVE_SPIDER)
 			{
@@ -272,6 +281,26 @@ public class FluffBlockDropListener implements Listener {
 		if(ent == EntityType.CREEPER)
 		{
 			event.setCancelled(true); //cause fuck creepers.
+		}
+	}
+	
+	@EventHandler
+	public void onItemDespawn(ItemDespawnEvent event)
+	{
+		Material item = event.getEntity().getItemStack().getType();
+		if(item == Material.BONE || item == Material.ROTTEN_FLESH || item == Material.STRING || item == Material.EGG || item == Material.ARROW)
+		{
+			return;
+		}
+		int amount = event.getEntity().getItemStack().getAmount();
+		String itemName = event.getEntity().getItemStack().getType().toString();
+		if(amount > 1)
+		{
+			Bukkit.broadcastMessage(ChatColor.YELLOW + "" + amount + " " + ChatColor.RESET + itemName + ChatColor.YELLOW + " despawned.");
+		}
+		else
+		{
+			Bukkit.broadcastMessage(itemName + ChatColor.YELLOW + " despawned.");
 		}
 	}
 	
