@@ -95,7 +95,8 @@ public class FluffBlockDropListener implements Listener {
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
 		String name = event.getPlayer().getName();
-		fsb.removePlayerFromSidebar(name);
+		ChatColor color = fwdb.getChatColor(name);
+		fsb.removePlayerFromSidebar(color + name);
 		event.setQuitMessage(fwdb.getChatColor(name) + name + ChatColor.YELLOW + " left the game.");
 	}
 	
