@@ -15,7 +15,9 @@ import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dpohvar.powernbt.PowerNBT;
 import me.dpohvar.powernbt.api.NBTCompound;
@@ -31,7 +33,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -507,4 +512,97 @@ public class FluffBlockDropListener implements Listener {
 			}
 		}
 	}
+	
+	private ItemStack BACK_ARROW = null;
+	private ItemStack INCREASE_BUTTON = null;
+	private ItemStack DECREASE_BUTTON = null;
+	
+	@EventHandler
+	public void onPlayerInteractWithOtherPlayer(PlayerInteractEntityEvent event)
+	{
+		
+		//NBTManager manager = PowerNBT.getApi();
+		
+		
+		Player clickedOn = (Player) event.getRightClicked(); //the entity that was clicked on
+        if(clickedOn instanceof Player)
+        {
+        	//The XP trade menu
+        	//Uses this cheat sheet: http://wiki.vg/File:Chest-slots.png
+        	//int levels_sent = 1;
+        	
+            event.getPlayer().sendMessage(clickedOn.getName());
+            
+            //TODO: make this global and keep players from modifying it
+            Inventory xpWindow = Bukkit.createInventory(null, InventoryType.CHEST, ChatColor.GREEN+""+ChatColor.BOLD+"Giving XP to "+clickedOn.getName()); //the main window that lets you adjust the XP
+            
+            //Makes the back arrow
+            ItemStack backArrow = new ItemStack(Material.PRISMARINE_SHARD);
+            ItemMeta backArrowMeta = backArrow.getItemMeta();
+            backArrowMeta.setDisplayName("Cancel?");
+            backArrow.setItemMeta(backArrowMeta);
+            BACK_ARROW = backArrow;
+            
+            //Sets it to the left
+            xpWindow.setItem(9, backArrow);
+            
+            //Makes the back arrow
+            ItemStack forwardArrow = new ItemStack(Material.FEATHER);
+            ItemMeta forwardArrowMeta = forwardArrow.getItemMeta();
+            forwardArrowMeta.setDisplayName("Give "+clickedOn.getName()+" 1 level of XP?"); //default value
+            forwardArrow.setItemMeta(forwardArrowMeta);
+            
+            //Sets it to the right
+            xpWindow.setItem(17, forwardArrow);
+            
+            //Makes the increase button
+            ItemStack increaseButton = new ItemStack(Material.WOOL, 1, (byte)5); //5 is the LIME color
+            ItemMeta increaseButtonMeta = increaseButton.getItemMeta();
+            increaseButtonMeta.setDisplayName("Increase XP by 1");
+            increaseButton.setItemMeta(increaseButtonMeta);
+            INCREASE_BUTTON = increaseButton;
+            
+            //Sets it to the upper middle
+            xpWindow.setItem(4, increaseButton);
+            
+            //Makes the increase button
+            ItemStack decreaseButton = new ItemStack(Material.WOOL, 1, (byte)14); //14 is the RED color
+            ItemMeta decreaseButtonMeta = decreaseButton.getItemMeta();
+            decreaseButtonMeta.setDisplayName("Decrease XP by 1");
+            decreaseButton.setItemMeta(decreaseButtonMeta);
+            DECREASE_BUTTON = decreaseButton;
+            
+            //Sets it to the lower middle
+            xpWindow.setItem(22, decreaseButton);
+            
+            ItemStack givenXP = new ItemStack(Material.EXP_BOTTLE);
+            ItemMeta givenXPMeta = givenXP.getItemMeta();
+            givenXPMeta.setDisplayName("1 Level"); //default value
+            givenXP.setItemMeta(givenXPMeta);
+            
+            xpWindow.setItem(13, givenXP);
+            
+            event.getPlayer().openInventory(xpWindow);
+            
+            
+        }
+	}
+	
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent event) {
+		/*Player player = (Player) event.getWhoClicked(); // The player that clicked the item
+		ItemStack clicked = event.getCurrentItem(); // The item that was clicked
+		Inventory inventory = event.getInventory(); // The inventory that was clicked in
+		if (inventory.getName().equals(myInventory.getName())) 
+		{ // The inventory is our custom Inventory
+			if (clicked.getType() == Material.DIRT) 
+			{ // The item that the player clicked it dirt
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				player.getInventory().addItem(new ItemStack(Material.DIRT, 1)); // Adds dirt
+			}
+		}*/
+	}
+	
+	
 }
