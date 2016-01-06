@@ -62,6 +62,6 @@ public class FluffsScoreboard {
 	
 	public void removePlayerFromSidebar(String name)
 	{
-		fwScoreboard.resetScores(fwdb.getChatColor(name) + name);
+		fwScoreboard.resetScores(name);
 	}
 }

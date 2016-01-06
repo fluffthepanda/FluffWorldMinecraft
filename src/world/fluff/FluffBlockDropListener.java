@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Guardian;
@@ -24,8 +25,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
@@ -34,12 +37,14 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 //import org.bukkit.event.inventory.FurnaceExtractEvent;
 
 public class FluffBlockDropListener implements Listener {
 	FWDBConnection fwdb;
 	FluffsScoreboard fsb;
+	ArrayList<Integer> mobsFromSpawnBlocks = new ArrayList<Integer>();
 	public FluffBlockDropListener(FWDBConnection conn, FluffsScoreboard fwScoreboard)
 	{
 		fwdb = conn;
@@ -90,7 +95,8 @@ public class FluffBlockDropListener implements Listener {
 	public void onPlayerLeave(PlayerQuitEvent event)
 	{
 		String name = event.getPlayer().getName();
-		fsb.removePlayerFromSidebar(name);
+		ChatColor color = fwdb.getChatColor(name);
+		fsb.removePlayerFromSidebar(color + name);
 		event.setQuitMessage(fwdb.getChatColor(name) + name + ChatColor.YELLOW + " left the game.");
 	}
 	
@@ -151,6 +157,11 @@ public class FluffBlockDropListener implements Listener {
 	@EventHandler
 	public void onCreatureKill(EntityDeathEvent event)
 	{
+		if(mobsFromSpawnBlocks.contains((Integer)event.getEntity().getEntityId()))
+		{
+			mobsFromSpawnBlocks.remove((Integer)event.getEntity().getEntityId());
+			return;
+		}
 		if(event.getEntity().getKiller() != null)
 		{
 			Player player = event.getEntity().getKiller().getPlayer();
@@ -159,7 +170,14 @@ public class FluffBlockDropListener implements Listener {
 			int rows = 0;
 			if(ent == EntityType.ENDERMAN)
 			{
-				rows = fwdb.givePlayerPoints(name, 8);
+				if(player.getWorld().getEnvironment().equals(World.Environment.THE_END))
+				{
+					rows = fwdb.givePlayerPoints(name, 2);
+				}
+				else
+				{
+					rows = fwdb.givePlayerPoints(name, 8);
+				}
 			}
 			else if(ent == EntityType.CAVE_SPIDER)
 			{
@@ -268,6 +286,26 @@ public class FluffBlockDropListener implements Listener {
 	}
 	
 	@EventHandler
+	public void onItemDespawn(ItemDespawnEvent event)
+	{
+		Material item = event.getEntity().getItemStack().getType();
+		if(item == Material.BONE || item == Material.ROTTEN_FLESH || item == Material.STRING || item == Material.EGG || item == Material.ARROW)
+		{
+			return;
+		}
+		int amount = event.getEntity().getItemStack().getAmount();
+		String itemName = event.getEntity().getItemStack().getType().toString();
+		if(amount > 1)
+		{
+			Bukkit.broadcastMessage(ChatColor.YELLOW + "" + amount + " " + ChatColor.RESET + itemName + ChatColor.YELLOW + " despawned.");
+		}
+		else
+		{
+			Bukkit.broadcastMessage(itemName + ChatColor.YELLOW + " despawned.");
+		}
+	}
+	
+	@EventHandler
 	public void onExpGain(PlayerExpChangeEvent event)
 	{
 		String name = event.getPlayer().getName();
@@ -353,6 +391,12 @@ public class FluffBlockDropListener implements Listener {
 		{
 			fsb.refreshPlayerPoints(name);
 		}
+	}
+	
+	@EventHandler
+	public void onSpawnerSpawn(SpawnerSpawnEvent event)
+	{
+		mobsFromSpawnBlocks.add(event.getEntity().getEntityId());
 	}
 	
 	@EventHandler
