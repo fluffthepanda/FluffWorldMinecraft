@@ -4,6 +4,22 @@ import java.util.ArrayList;
 
 public class TransactionManager 
 {
+	
+	/*
+	 * IMPORTANT
+	 * 
+	 * Ideally, there shouldn't be a transaction of the same type between the same two players, 
+	 * thus making them identifiable to the client-code throughout the plugin.
+	 * It is imperative to recognize when an interaction is over 
+	 * (even if a player didn't intend for it to happen, such as accidentally closing the inventory)
+	 * and calling the close() method for a transaction, canceling the transaction completely.
+	 * 
+	 * With this in mind, we can effectively use this transaction system to store information 
+	 * temporarily for independent confrontations. In addition, this system isn't built around
+	 * what the player is trading and most around who is involved.
+	 * 
+	 */
+	
 	//The ledger of active transactions that are still in progress
 	private static ArrayList<PlayerTransaction> activeLedger = new ArrayList<PlayerTransaction>();
 	public static long lastId = 0;
