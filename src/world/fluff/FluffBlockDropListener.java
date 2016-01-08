@@ -22,6 +22,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.dpohvar.powernbt.PowerNBT;
 import me.dpohvar.powernbt.api.NBTCompound;
 import me.dpohvar.powernbt.api.NBTManager;
+import world.fluff.transaction.TransactionManager;
+import world.fluff.transaction.TransactionType;
+import world.fluff.transaction.XPDonation;
 
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -516,6 +519,7 @@ public class FluffBlockDropListener implements Listener {
 	private ItemStack BACK_ARROW = null;
 	private ItemStack INCREASE_BUTTON = null;
 	private ItemStack DECREASE_BUTTON = null;
+	private String TRADE_INFO = ChatColor.GREEN+""+ChatColor.BOLD+"Trade ID: ";
 	
 	@EventHandler
 	public void onPlayerInteractWithOtherPlayer(PlayerInteractEntityEvent event)
@@ -531,10 +535,13 @@ public class FluffBlockDropListener implements Listener {
         	//Uses this cheat sheet: http://wiki.vg/File:Chest-slots.png
         	//int levels_sent = 1;
         	
-            event.getPlayer().sendMessage(clickedOn.getName());
-            
-            //TODO: make this global and keep players from modifying it
-            Inventory xpWindow = Bukkit.createInventory(null, InventoryType.CHEST, ChatColor.GREEN+""+ChatColor.BOLD+"Giving XP to "+clickedOn.getName()); //the main window that lets you adjust the XP
+        	event.getPlayer().sendMessage(clickedOn.getName());
+        	
+        	//PlayerTransaction stuff!!
+            XPDonation trade = new XPDonation(event.getPlayer(), clickedOn, 1);
+            trade.open();
+            long id = trade.getId();
+            TransactionManager.get(id).setWindow(Bukkit.createInventory(null, InventoryType.CHEST, TRADE_INFO+trade.getId()));
             
             //Makes the back arrow
             ItemStack backArrow = new ItemStack(Material.PRISMARINE_SHARD);
@@ -544,7 +551,7 @@ public class FluffBlockDropListener implements Listener {
             BACK_ARROW = backArrow;
             
             //Sets it to the left
-            xpWindow.setItem(9, backArrow);
+            TransactionManager.get(id).getWindow().setItem(9, backArrow);
             
             //Makes the back arrow
             ItemStack forwardArrow = new ItemStack(Material.FEATHER);
@@ -553,7 +560,7 @@ public class FluffBlockDropListener implements Listener {
             forwardArrow.setItemMeta(forwardArrowMeta);
             
             //Sets it to the right
-            xpWindow.setItem(17, forwardArrow);
+            TransactionManager.get(id).getWindow().setItem(17, forwardArrow);
             
             //Makes the increase button
             ItemStack increaseButton = new ItemStack(Material.WOOL, 1, (byte)5); //5 is the LIME color
@@ -563,7 +570,7 @@ public class FluffBlockDropListener implements Listener {
             INCREASE_BUTTON = increaseButton;
             
             //Sets it to the upper middle
-            xpWindow.setItem(4, increaseButton);
+            TransactionManager.get(id).getWindow().setItem(4, increaseButton);
             
             //Makes the increase button
             ItemStack decreaseButton = new ItemStack(Material.WOOL, 1, (byte)14); //14 is the RED color
@@ -573,26 +580,50 @@ public class FluffBlockDropListener implements Listener {
             DECREASE_BUTTON = decreaseButton;
             
             //Sets it to the lower middle
-            xpWindow.setItem(22, decreaseButton);
+            TransactionManager.get(id).getWindow().setItem(22, decreaseButton);
             
             ItemStack givenXP = new ItemStack(Material.EXP_BOTTLE);
             ItemMeta givenXPMeta = givenXP.getItemMeta();
             givenXPMeta.setDisplayName("1 Level"); //default value
             givenXP.setItemMeta(givenXPMeta);
             
-            xpWindow.setItem(13, givenXP);
+            TransactionManager.get(id).getWindow().setItem(13, givenXP);
             
-            event.getPlayer().openInventory(xpWindow);
-            
+            event.getPlayer().openInventory(trade.getWindow());
             
         }
 	}
 	
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent event) {
-		/*Player player = (Player) event.getWhoClicked(); // The player that clicked the item
+		Player player = (Player) event.getWhoClicked(); // The player that clicked the item
 		ItemStack clicked = event.getCurrentItem(); // The item that was clicked
-		Inventory inventory = event.getInventory(); // The inventory that was clicked in
+		
+		try
+		{
+			long id = Long.parseLong(event.getInventory().getTitle().substring(TRADE_INFO.length()));
+			if(TransactionManager.transactionExists(id))
+			{
+				//System.out.print("InventoryClickEvent in transaction ID: "+id);
+				
+				TransactionType type = TransactionManager.get(id).getType();
+				
+				if(type.equals(TransactionType.XP_DONATION))
+				{
+					//do certain actions based on what the user clicks on the inventory, even modify the inventory if we need to
+				}
+			}
+			else
+			{
+				//Either a fake inventory, or a glitch occurred
+			}
+		}
+		catch(Exception e)
+		{
+			//Not a special transaction inventory
+		}
+		
+		/*Inventory inventory = event.getInventory(); // The inventory that was clicked in
 		if (inventory.getName().equals(myInventory.getName())) 
 		{ // The inventory is our custom Inventory
 			if (clicked.getType() == Material.DIRT) 

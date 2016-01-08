@@ -45,7 +45,18 @@ public class TransactionManager
 		activeLedger.add(transaction);
 	}
 	
-	public PlayerTransaction getTransactionById(long id)
+	public static void set(long id, PlayerTransaction transaction)
+	{
+		for(int i = 0; i < activeLedger.size(); i++)
+		{
+			if(activeLedger.get(i).getId() == id)
+			{
+				activeLedger.set(i, transaction);
+			}
+		}
+	}
+	
+	public static PlayerTransaction get(long id)
 	{
 		for(PlayerTransaction item : activeLedger)
 		{
@@ -55,6 +66,18 @@ public class TransactionManager
 			}
 		}
 		return null;
+	}
+	
+	public static boolean transactionExists(long id)
+	{
+		for(PlayerTransaction item : activeLedger)
+		{
+			if(item.id == id)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

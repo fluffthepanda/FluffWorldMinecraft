@@ -63,5 +63,20 @@ public class XPDonation extends PlayerTransaction
 		this.sender.setLevel(this.sender.getLevel()-amount);
 		this.receiver.setLevel(this.receiver.getLevel()+amount);
 	}
-
+	
+	public void addAmount(int dif)
+	{
+		amount += dif;
+	}
+	
+	public void incrementAmount()
+	{
+		amount++;
+	}
+	
+	public void decrementAmount()
+	{
+		amount--;
+	}
+	
 }

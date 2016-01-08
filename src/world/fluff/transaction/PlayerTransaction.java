@@ -1,6 +1,7 @@
 package world.fluff.transaction;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 public abstract class PlayerTransaction 
 {
@@ -10,6 +11,7 @@ public abstract class PlayerTransaction
 	protected Player receiver = null;
 	protected TransactionType transactionType = null;
 	protected boolean isOpen = false;
+	protected Inventory window;
 	
 	public abstract boolean isValid(); //Check if the transact() method can be called appropriately
 	
@@ -34,5 +36,26 @@ public abstract class PlayerTransaction
 		transact();
 		System.out.println("Transaction of type "+transactionType+" has been done between "+sender.getName()+" and "+receiver.getName()+" (id: "+id+")");
 	}
+	
+	public long getId()
+	{
+		return id;
+	}
+	
+	public void setWindow(Inventory window)
+	{
+		this.window = window;
+	}
+	
+	public Inventory getWindow()
+	{
+		return this.window;
+	}
+	
+	public TransactionType getType()
+	{
+		return this.transactionType;
+	}
+
 	
 }
