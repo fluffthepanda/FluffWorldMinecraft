@@ -18,7 +18,6 @@ import me.dpohvar.powernbt.PowerNBT;
 import me.dpohvar.powernbt.api.NBTCompound;
 import me.dpohvar.powernbt.api.NBTList;
 import me.dpohvar.powernbt.api.NBTManager;
-import world.fluff.transaction.TransactionManager;
 
 public class FluffWorldIntegration extends JavaPlugin {
 	private FWDBConnection fwdb;
@@ -31,16 +30,12 @@ public class FluffWorldIntegration extends JavaPlugin {
     	fwdb = new FWDBConnection();
     	fsb = new FluffsScoreboard(Bukkit.getScoreboardManager().getNewScoreboard(), fwdb);
     	getServer().getPluginManager().registerEvents(new FluffBlockDropListener(fwdb, fsb), this);
-    	//Retrieves the last transaction ID
-    	TransactionManager.lastId = this.getConfig().getLong("world.fluff.transaction.TransactionManager.lastId");
     }
     // Fired when plugin is disabled
     @Override
     public void onDisable() {
     	fwdb.kill();
     	fsb.kill();
-    	this.getConfig().set("world.fluff.transaction.TransactionManager.lastId", TransactionManager.lastId);
-    	this.saveConfig();
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
