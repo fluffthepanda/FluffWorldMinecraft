@@ -25,15 +25,12 @@ commands:
        /bedspawn [broadcast]
        Example: /bedspawn - privately tells you of where your bed is
        Example: /bedspawn broadcast - publically broadcasts your bed
-  dropxp:
-    description: (FWMC) Drop your XP orbs onto the ground
-    usage: /dropxp <orb count>
   convertxp:
     description: (FWMC) Convert XP levels <-> orbs
     usage: |
        /convertxp <amount> <orbs | levels>
        Example: /convertxp 452 orbs
        Example: /convertxp 15 levels
-  fwxp:
-    description: (FWMC) add or subtract orbs
-    usage: /fwmc <orbs>
+  dropxp:
+    description: (FWMC) Drop your XP orbs onto the ground
+    usage: /dropxp <orb count>

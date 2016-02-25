@@ -295,44 +295,16 @@ public class FluffWorldIntegration extends JavaPlugin {
             }
             else if(command.getName().equalsIgnoreCase("dropxp"))
             {
-            	
-            	/*
-            	
-dropXP(requestedDrop):
-	- if (Util.getTotalExpOrbsFromPlayer(p) >= requestedDrop)
-		- int orbBuffer = player.getTotalExperience();
-		- if (orbBuffer >= requestedDrop)
-			- removes xp from lifetime xp in database to prevent duping
-			- removes xp from player
-			- drops xp as entity
-		- else
-			- while (orbBuffer < requestedDrop)
-				- int levelWorth = levelsToExpOrbs(player.getLevel())-levelsToExpOrbs(player.getLevel()-1)
-				- player.setLevel(player.getLevel()-1)
-				- orbBuffer += levelWorth
-			- orbBuffer -= requestedDrop
-			- removes xp from lifetime xp in database to prevent duping
-			- removes xp from player
-			- drops xp as entity
-	- else
-		- //you don't have enough
-            	
-            	
-            	
-            	
-            	
-            	
-            	
-            	*/
         		try
         		{
         			Player player = sender.getServer().getPlayer(sender.getName());
             		int requestedDrop = Integer.parseInt(args[0]);
-                	if(Util.getTotalExpOrbsFromPlayer(player) >= requestedDrop)
+            		ExperienceManager manager = new ExperienceManager(player);
+                	if(manager.getTotalExperience() >= requestedDrop)
                 	{
                 		//Adjusting variables
-                		Util.subtractExpOrbsFromPlayer(player, requestedDrop);
-                		fwdb.removeXp(player.getName(), requestedDrop);
+                		manager.setTotalExperience(manager.getTotalExperience() - requestedDrop);
+                		//fwdb.removeXp(player.getName(), requestedDrop);
                 		
                 		//Dropping the orbs
                         ExperienceOrb orb = null;
@@ -375,29 +347,6 @@ dropXP(requestedDrop):
             		else
             		{
             			return false;
-            		}
-            	}
-            	catch(Exception e)
-            	{
-            		return false;
-            	}
-            }
-            else if(command.getName().equalsIgnoreCase("fwxp")) 
-            {
-            	try
-            	{
-            		int offset = Integer.parseInt(args[0]);
-            		if(offset > 0) 
-            		{
-            			Util.addExpOrbsFromPlayer(((Player) sender).getPlayer(), offset);
-            		}
-            		else if(offset < 0)
-            		{
-            			Util.subtractExpOrbsFromPlayer(((Player) sender).getPlayer(), offset);
-            		}
-            		else 
-            		{
-            			//0
             		}
             	}
             	catch(Exception e)

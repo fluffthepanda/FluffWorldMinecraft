@@ -1,13 +1,7 @@
 package world.fluff;
 
-import org.bukkit.entity.Player;
-
 public class Util 
 {
-	
-	//XP ORBS MATH FUNCTIONS
-	//NOTE: x == Math.floor(expOrbsToLevels(levelsToExpOrbs(x)))
-	//This should be true^
 	
 	public static final int NATURAL_PLAYER_LEVEL_CAP = 21863; //The experience level cap for players who earn exp without commands or mods
 	
@@ -54,55 +48,4 @@ public class Util
 		}
 		return 0; //invalid scenario
 	}
-	
-	/*
-	
-	2[Current Level] + 7 (at levels 0-16)
-	5[Current Level] - 38 (at levels 17-31)
-	9[Current Level] - 158 (at level 32+)
-	
-	*/
-	public static int getTotalExpOrbsFromPlayer(Player player) {
-		return levelsToExpOrbs(player.getLevel())+player.getTotalExperience();
-	}
-	
-	public static void subtractExpOrbsFromPlayer(Player player, int orbs) {
-		int orbBuffer = player.getTotalExperience();
-		//The player has enough orbs without a converting any levels to orbs
-		if(orbBuffer >= orbs)
-		{
-			player.setTotalExperience(player.getTotalExperience()-orbs);
-		}
-		else
-		{
-			int levelWorth = 0;
-			while(orbBuffer < orbs)
-			{
-				levelWorth = levelWorth(player.getLevel());
-				player.setLevel(player.getLevel()-1);
-				orbBuffer += levelWorth;
-			}
-			orbBuffer -= levelWorth; //Does this to prevent remainder orbs from being lost
-			player.setTotalExperience(player.getTotalExperience()+orbBuffer); //Does this to prevent remainder orbs from being lost
-		}
-	}
-	
-	public static void addExpOrbsFromPlayer(Player player, int orbs) {
-		//int orbs = Integer.parseInt(args[0]);
-		int levels = Util.expOrbsToLevels(orbs);
-		int remainder = orbs-Util.levelsToExpOrbs(levels);
-		player.setLevel(player.getLevel()+levels);
-		if(remainder > player.getExpToLevel())
-		{
-			remainder -= player.getExpToLevel();
-			player.setLevel(player.getLevel()+1);
-			player.setTotalExperience(remainder);
-		}
-		else
-		{
-			player.setTotalExperience(player.getTotalExperience()+remainder);
-		}
-		
-	}
-
 }
