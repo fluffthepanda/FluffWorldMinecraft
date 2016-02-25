@@ -290,6 +290,45 @@ public class FluffWorldIntegration extends JavaPlugin {
             	}
             	return true;
             }
+            else if(command.getName().equalsIgnoreCase("dropxp"))
+            {
+        		Player p = sender.getServer().getPlayer(sender.getName());
+            	int xp = Util.getTotalExpOrbsFromPlayer(p);
+            	sender.sendMessage("You have "+xp+" total orbs. That calculuates as level: "+Util.expOrbsToLevels(xp));
+            }
+            else if(command.getName().equalsIgnoreCase("xpconvert"))
+            {
+            	try
+            	{
+            		if(args[0].toLowerCase().equals("orbs"))
+            		{
+            			int orbs = Integer.parseInt(args[1]);
+            			int levels = Util.expOrbsToLevels(orbs);
+            			int remainder = Util.levelsToExpOrbs(levels)-orbs;
+            			
+            			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+orbs+" orbs = "+levels+" levels + "+remainder+" orbs remaining.");
+            			
+            		}
+            		else if(args[0].toLowerCase().equals("levels")) 
+            		{
+            			int levels = Integer.parseInt(args[1]);
+            			int orbs = Util.levelsToExpOrbs(levels);
+            			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+levels+" levels = "+orbs+" orbs.");
+            		}
+            		else
+            		{
+            			return false;
+            		}
+            	}
+            	catch(Exception e)
+            	{
+            		return false;
+            	}
+            }
+        }
+        else
+        {
+        	sender.sendMessage("Sorry, you have to be a player to use that command.");
         }
         return false;
     }

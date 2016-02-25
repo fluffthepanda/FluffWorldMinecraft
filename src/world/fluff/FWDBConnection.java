@@ -114,6 +114,26 @@ public class FWDBConnection {
 	    }
 		return 0;
 	}
+	public int removeXp(String name, int xp)
+	{
+		xp = -1*xp; //Removes some XP
+		try
+	    {
+	    	stmt = connection.createStatement();
+	    	int rowCount = stmt.executeUpdate("UPDATE fwmc_points SET lifetime_xp = lifetime_xp + " + xp + " WHERE name = '" + name + "'");
+	    	if(rowCount > 0)
+	    	{
+	    		return rowCount;
+	    	}
+	    }
+	    catch(SQLException ex)
+	    {
+	    	 System.out.println("SQLException: " + ex.getMessage());
+	    	 System.out.println("SQLState: " + ex.getSQLState());
+	    	 System.out.println("VendorError: " + ex.getErrorCode());
+	    }
+		return 0;
+	}
 	
 	public int changeChatColor(String name, String color)
 	{
