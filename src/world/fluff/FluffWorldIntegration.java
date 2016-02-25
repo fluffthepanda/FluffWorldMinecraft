@@ -1,17 +1,21 @@
 package world.fluff;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -302,23 +306,33 @@ public class FluffWorldIntegration extends JavaPlugin {
             		System.out.println(SetExpFix.getTotalExperience(player));
                 	if(SetExpFix.getTotalExperience(player) >= requestedDrop)
                 	{
-                		//Adjusting variables
-                		SetExpFix.setTotalExperience(player, SetExpFix.getTotalExperience(player) - requestedDrop);
-                		//fwdb.removeXp(player.getName(), requestedDrop);
-                		
                 		//Dropping the orbs
                         ExperienceOrb orb = null;
-                        Entity ent = player.getWorld().spawnEntity(player.getLocation().add(7, 0, 0), EntityType.EXPERIENCE_ORB);
-                        orb = (ExperienceOrb)ent;
-                        orb.setExperience(requestedDrop);
+                        Block target = player.getTargetBlock((Set<Material>)null, 5);
+                        System.out.println(target);
+                        if(target != null)
+                        {
+                        	//Adjusting variables
+                    		SetExpFix.setTotalExperience(player, SetExpFix.getTotalExperience(player) - requestedDrop);
+                    		//fwdb.removeXp(player.getName(), requestedDrop);
+                    		
+                        	Entity ent = player.getWorld().spawnEntity(target.getLocation(), EntityType.EXPERIENCE_ORB);
+                            orb = (ExperienceOrb)ent;
+                            orb.setExperience(requestedDrop);
+                            
+                            Firework fw = (Firework) player.getWorld().spawnEntity(target.getLocation(), EntityType.FIREWORK);
+                        }
+                        else 
+                        {
+                        	sender.sendMessage("Please look at and select a block before running this command.");
+                        }
+                        
+                      
                 	}
                 	else
                 	{
                 		sender.sendMessage("You don\'t have enough experience to drop "+requestedDrop+" orbs.");
-                	}
-                	
-                	
-                	
+                	}     	
         		}
         		catch(Exception e)
         		{
