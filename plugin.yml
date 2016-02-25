@@ -21,11 +21,19 @@ commands:
     usage: /withdraw <points to withdraw>
   bedspawn:
     description: (FWMC) Get the location of your bed spawn's location, or broadcast it to other players
-    usage: /bedspawn [broadcast]
+    usage: |
+       /bedspawn [broadcast]
+       Example: /bedspawn - privately tells you of where your bed is
+       Example: /bedspawn broadcast - publically broadcasts your bed
   dropxp:
-    description: (FWMC) Drop XP orbs onto the ground
-    usage: /dropxp
-  xpconvert:
+    description: (FWMC) Drop your XP orbs onto the ground
+    usage: /dropxp <orb count>
+  convertxp:
     description: (FWMC) Convert XP levels <-> orbs
-    usage: /xpconvert <orbs | levels> <amount>
-
+    usage: |
+       /convertxp <amount> <orbs | levels>
+       Example: /convertxp 452 orbs
+       Example: /convertxp 15 levels
+  fwxp:
+    description: (FWMC) add or subtract orbs
+    usage: /fwmc <orbs>

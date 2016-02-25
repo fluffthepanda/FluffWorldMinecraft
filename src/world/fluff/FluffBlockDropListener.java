@@ -310,13 +310,13 @@ public class FluffBlockDropListener implements Listener {
 	{
 		String name = event.getPlayer().getName();
 		int amount = event.getAmount();
-		fwdb.addXp(name, amount);
+		//fwdb.addXp(name, amount);
 	}
 	
 	@EventHandler
 	public void onLevelChange(PlayerLevelChangeEvent event)
 	{
-		fsb.refreshPlayerXP(event.getPlayer());
+		//fsb.refreshPlayerXP(event.getPlayer());
 	}
 	
 	@EventHandler

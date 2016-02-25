@@ -9,6 +9,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -292,32 +295,109 @@ public class FluffWorldIntegration extends JavaPlugin {
             }
             else if(command.getName().equalsIgnoreCase("dropxp"))
             {
-        		Player p = sender.getServer().getPlayer(sender.getName());
-            	int xp = Util.getTotalExpOrbsFromPlayer(p);
-            	sender.sendMessage("You have "+xp+" total orbs. That calculuates as level: "+Util.expOrbsToLevels(xp));
+            	
+            	/*
+            	
+dropXP(requestedDrop):
+	- if (Util.getTotalExpOrbsFromPlayer(p) >= requestedDrop)
+		- int orbBuffer = player.getTotalExperience();
+		- if (orbBuffer >= requestedDrop)
+			- removes xp from lifetime xp in database to prevent duping
+			- removes xp from player
+			- drops xp as entity
+		- else
+			- while (orbBuffer < requestedDrop)
+				- int levelWorth = levelsToExpOrbs(player.getLevel())-levelsToExpOrbs(player.getLevel()-1)
+				- player.setLevel(player.getLevel()-1)
+				- orbBuffer += levelWorth
+			- orbBuffer -= requestedDrop
+			- removes xp from lifetime xp in database to prevent duping
+			- removes xp from player
+			- drops xp as entity
+	- else
+		- //you don't have enough
+            	
+            	
+            	
+            	
+            	
+            	
+            	
+            	*/
+        		try
+        		{
+        			Player player = sender.getServer().getPlayer(sender.getName());
+            		int requestedDrop = Integer.parseInt(args[0]);
+                	if(Util.getTotalExpOrbsFromPlayer(player) >= requestedDrop)
+                	{
+                		//Adjusting variables
+                		Util.subtractExpOrbsFromPlayer(player, requestedDrop);
+                		fwdb.removeXp(player.getName(), requestedDrop);
+                		
+                		//Dropping the orbs
+                        ExperienceOrb orb = null;
+                        Entity ent = player.getWorld().spawnEntity(player.getLocation().add(7, 0, 0), EntityType.EXPERIENCE_ORB);
+                        orb = (ExperienceOrb)ent;
+                        orb.setExperience(requestedDrop);
+                	}
+                	else
+                	{
+                		sender.sendMessage("You don\'t have enough experience to drop "+requestedDrop+" orbs.");
+                	}
+                	
+                	
+                	
+        		}
+        		catch(Exception e)
+        		{
+        			return false;
+        		}
             }
-            else if(command.getName().equalsIgnoreCase("xpconvert"))
+            else if(command.getName().equalsIgnoreCase("convertxp"))
             {
             	try
             	{
-            		if(args[0].toLowerCase().equals("orbs"))
+            		if(args[1].toLowerCase().equals("orbs") || args[1].toLowerCase().equals("orb"))
             		{
-            			int orbs = Integer.parseInt(args[1]);
+            			int orbs = Integer.parseInt(args[0]);
             			int levels = Util.expOrbsToLevels(orbs);
-            			int remainder = Util.levelsToExpOrbs(levels)-orbs;
-            			
+            			int remainder = orbs-Util.levelsToExpOrbs(levels);
             			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+orbs+" orbs = "+levels+" levels + "+remainder+" orbs remaining.");
-            			
+            			return true;
             		}
-            		else if(args[0].toLowerCase().equals("levels")) 
+            		else if(args[1].toLowerCase().equals("levels") || args[1].toLowerCase().equals("level")) 
             		{
-            			int levels = Integer.parseInt(args[1]);
+            			int levels = Integer.parseInt(args[0]);
             			int orbs = Util.levelsToExpOrbs(levels);
             			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+levels+" levels = "+orbs+" orbs.");
+            			return true;
             		}
             		else
             		{
             			return false;
+            		}
+            	}
+            	catch(Exception e)
+            	{
+            		return false;
+            	}
+            }
+            else if(command.getName().equalsIgnoreCase("fwxp")) 
+            {
+            	try
+            	{
+            		int offset = Integer.parseInt(args[0]);
+            		if(offset > 0) 
+            		{
+            			Util.addExpOrbsFromPlayer(((Player) sender).getPlayer(), offset);
+            		}
+            		else if(offset < 0)
+            		{
+            			Util.subtractExpOrbsFromPlayer(((Player) sender).getPlayer(), offset);
+            		}
+            		else 
+            		{
+            			//0
             		}
             	}
             	catch(Exception e)
