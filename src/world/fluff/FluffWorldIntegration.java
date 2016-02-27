@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -320,7 +321,11 @@ public class FluffWorldIntegration extends JavaPlugin {
                             orb = (ExperienceOrb)ent;
                             orb.setExperience(requestedDrop);
                             
-                            Firework fw = (Firework) player.getWorld().spawnEntity(target.getLocation(), EntityType.FIREWORK);
+                            player.getWorld().playEffect(target.getLocation().add(-0.25, 1, 0), Effect.INSTANT_SPELL, null);
+                            player.getWorld().playEffect(target.getLocation().add(0.25, 1, 0), Effect.INSTANT_SPELL, null);
+                            player.getWorld().playEffect(target.getLocation().add(0, 1, -0.25), Effect.INSTANT_SPELL, null);
+                            player.getWorld().playEffect(target.getLocation().add(0, 1, 0.25), Effect.INSTANT_SPELL, null);
+                            //Firework fw = (Firework) player.getWorld().spawnEntity(target.getLocation().add(0.5, 0.5, 0.5), EntityType.FIREWORK);
                         }
                         else 
                         {
@@ -341,6 +346,8 @@ public class FluffWorldIntegration extends JavaPlugin {
             }
             else if(command.getName().equalsIgnoreCase("convertxp"))
             {
+            	Player player = sender.getServer().getPlayer(sender.getName());
+            	
             	try
             	{
             		if(args[1].toLowerCase().equals("orbs") || args[1].toLowerCase().equals("orb"))
@@ -365,7 +372,14 @@ public class FluffWorldIntegration extends JavaPlugin {
             	}
             	catch(Exception e)
             	{
-            		return false;
+            		//This runs if there's no arguments
+            		
+            		int orbs = SetExpFix.getTotalExperience(player);
+        			int levels = player.getLevel();
+        			int remainder = orbs-Util.levelsToExpOrbs(levels);
+        			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"You have: "+ChatColor.BOLD+orbs+" orbs"+ChatColor.RESET+ChatColor.GRAY+ChatColor.ITALIC+" ("+levels+" levels + "+remainder+" orbs remaining).");
+            		
+            		return true;
             	}
             }
         }

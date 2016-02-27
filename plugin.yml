@@ -28,7 +28,7 @@ commands:
   convertxp:
     description: (FWMC) Convert XP levels <-> orbs
     usage: |
-       /convertxp <amount> <orbs | levels>
+       /convertxp [amount] [orbs | levels]
        Example: /convertxp 452 orbs
        Example: /convertxp 15 levels
   dropxp:
