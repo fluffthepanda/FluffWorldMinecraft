@@ -1,14 +1,22 @@
 package world.fluff;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -290,6 +298,89 @@ public class FluffWorldIntegration extends JavaPlugin {
             	}
             	return true;
             }
+            else if(command.getName().equalsIgnoreCase("dropxp"))
+            {
+        		try
+        		{
+        			Player player = sender.getServer().getPlayer(sender.getName());
+            		int requestedDrop = Integer.parseInt(args[0]);
+                	if(SetExpFix.getTotalExperience(player) >= requestedDrop)
+                	{
+                		//Dropping the orbs
+                        ExperienceOrb orb = null;
+                        Block target = player.getTargetBlock((Set<Material>)null, 5);
+                        if(target != null)
+                        {
+                        	//Adjusting variables
+                    		SetExpFix.setTotalExperience(player, SetExpFix.getTotalExperience(player) - requestedDrop);
+                    		fwdb.removeXp(player.getName(), requestedDrop);
+                    		
+                        	Entity ent = player.getWorld().spawnEntity(target.getLocation(), EntityType.EXPERIENCE_ORB);
+                            orb = (ExperienceOrb)ent;
+                            orb.setExperience(requestedDrop);
+                            
+                            player.getWorld().playEffect(target.getLocation().add(-0.05, 1.5, 0), Effect.HAPPY_VILLAGER, null);
+                            player.getWorld().playEffect(target.getLocation().add(0.05, 1.5, 0), Effect.HAPPY_VILLAGER, null);
+                        }
+                        else 
+                        {
+                        	sender.sendMessage(ChatColor.YELLOW+"Please look at and select a block before running this command.");
+                        	return true;
+                        }   
+                	}
+                	else
+                	{
+                		sender.sendMessage(ChatColor.YELLOW+"You don\'t have enough experience to drop "+requestedDrop+" orbs.");
+                		return true;
+                	}     	
+        		}
+        		catch(Exception e)
+        		{
+        			return false;
+        		}
+            }
+            else if(command.getName().equalsIgnoreCase("convertxp"))
+            {
+            	Player player = sender.getServer().getPlayer(sender.getName());
+            	
+            	try
+            	{
+            		if(args[1].toLowerCase().equals("orbs") || args[1].toLowerCase().equals("orb"))
+            		{
+            			int orbs = Integer.parseInt(args[0]);
+            			int levels = Util.expOrbsToLevels(orbs);
+            			int remainder = orbs-Util.levelsToExpOrbs(levels);
+            			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+orbs+" orbs = "+levels+" levels + "+remainder+" orbs remaining.");
+            			return true;
+            		}
+            		else if(args[1].toLowerCase().equals("levels") || args[1].toLowerCase().equals("level")) 
+            		{
+            			int levels = Integer.parseInt(args[0]);
+            			int orbs = Util.levelsToExpOrbs(levels);
+            			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+""+levels+" levels = "+orbs+" orbs.");
+            			return true;
+            		}
+            		else
+            		{
+            			return false;
+            		}
+            	}
+            	catch(Exception e)
+            	{
+            		//This runs if there's no arguments
+            		
+            		int orbs = SetExpFix.getTotalExperience(player);
+        			int levels = player.getLevel();
+        			int remainder = orbs-Util.levelsToExpOrbs(levels);
+        			sender.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"You have: "+ChatColor.BOLD+orbs+" orbs"+ChatColor.RESET+ChatColor.GRAY+ChatColor.ITALIC+" ("+levels+" levels + "+remainder+" orbs remaining).");
+            		
+            		return true;
+            	}
+            }
+        }
+        else
+        {
+        	sender.sendMessage("Sorry, you have to be a player to use that command.");
         }
         return false;
     }
