@@ -321,11 +321,8 @@ public class FluffWorldIntegration extends JavaPlugin {
                             orb = (ExperienceOrb)ent;
                             orb.setExperience(requestedDrop);
                             
-                            player.getWorld().playEffect(target.getLocation().add(-0.25, 1, 0), Effect.INSTANT_SPELL, null);
-                            player.getWorld().playEffect(target.getLocation().add(0.25, 1, 0), Effect.INSTANT_SPELL, null);
-                            player.getWorld().playEffect(target.getLocation().add(0, 1, -0.25), Effect.INSTANT_SPELL, null);
-                            player.getWorld().playEffect(target.getLocation().add(0, 1, 0.25), Effect.INSTANT_SPELL, null);
-                            //Firework fw = (Firework) player.getWorld().spawnEntity(target.getLocation().add(0.5, 0.5, 0.5), EntityType.FIREWORK);
+                            player.getWorld().playEffect(target.getLocation().add(-0.05, 1.5, 0), Effect.HAPPY_VILLAGER, null);
+                            player.getWorld().playEffect(target.getLocation().add(0.05, 1.5, 0), Effect.HAPPY_VILLAGER, null);
                         }
                         else 
                         {
