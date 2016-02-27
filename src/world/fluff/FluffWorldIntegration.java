@@ -304,18 +304,16 @@ public class FluffWorldIntegration extends JavaPlugin {
         		{
         			Player player = sender.getServer().getPlayer(sender.getName());
             		int requestedDrop = Integer.parseInt(args[0]);
-            		System.out.println(SetExpFix.getTotalExperience(player));
                 	if(SetExpFix.getTotalExperience(player) >= requestedDrop)
                 	{
                 		//Dropping the orbs
                         ExperienceOrb orb = null;
                         Block target = player.getTargetBlock((Set<Material>)null, 5);
-                        System.out.println(target);
                         if(target != null)
                         {
                         	//Adjusting variables
                     		SetExpFix.setTotalExperience(player, SetExpFix.getTotalExperience(player) - requestedDrop);
-                    		//fwdb.removeXp(player.getName(), requestedDrop);
+                    		fwdb.removeXp(player.getName(), requestedDrop);
                     		
                         	Entity ent = player.getWorld().spawnEntity(target.getLocation(), EntityType.EXPERIENCE_ORB);
                             orb = (ExperienceOrb)ent;
