@@ -325,13 +325,13 @@ public class FluffWorldIntegration extends JavaPlugin {
                         else 
                         {
                         	sender.sendMessage(ChatColor.YELLOW+"Please look at and select a block before running this command.");
-                        }
-                        
-                      
+                        	return true;
+                        }   
                 	}
                 	else
                 	{
                 		sender.sendMessage(ChatColor.YELLOW+"You don\'t have enough experience to drop "+requestedDrop+" orbs.");
+                		return true;
                 	}     	
         		}
         		catch(Exception e)
