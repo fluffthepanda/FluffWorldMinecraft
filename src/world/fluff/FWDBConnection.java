@@ -116,11 +116,10 @@ public class FWDBConnection {
 	}
 	public int removeXp(String name, int xp)
 	{
-		xp = -1*xp; //Removes some XP
 		try
 	    {
 	    	stmt = connection.createStatement();
-	    	int rowCount = stmt.executeUpdate("UPDATE fwmc_points SET lifetime_xp = lifetime_xp + " + xp + " WHERE name = '" + name + "'");
+	    	int rowCount = stmt.executeUpdate("UPDATE fwmc_points SET lifetime_xp = lifetime_xp - " + xp + " WHERE name = '" + name + "'");
 	    	if(rowCount > 0)
 	    	{
 	    		return rowCount;
